@@ -1,0 +1,695 @@
+/* ===================================================================
+   DESIGN DAN — 공통 스타일시트
+   BEM(블록__요소--상태) 클래스 네이밍을 씁니다.
+   색상 · 간격 값은 전부 아래 :root 변수를 쓰고, 새 색을 즉흥적으로
+   만들지 않습니다. (pdcebu 프로젝트와 동일한 규칙)
+   =================================================================== */
+
+:root {
+    /* 색상 — designs-dan.com(기존 사이트)에서 관찰한 팔레트를 옮겼습니다 */
+    --color-bg:          #ffffff;
+    --color-bg-cream:    #f6f2ec;
+    --color-bg-dark:     #101012;
+    --color-bg-dark-2:   #17161a;
+    --color-text:        #18181b;
+    --color-text-muted:  #6b6b70;
+    --color-text-soft:   #8b8b90;
+    --color-text-inverse: #f7f5f2;
+    --color-text-inverse-muted: #a8a6a3;
+    --color-border:      #e7e2d9;
+    --color-border-dark: #2c2b2f;
+    --color-accent:      #f2b705;   /* 히어로 / 다크 섹션 포인트 */
+    --color-accent-warm: #d9772c;   /* 밝은 배경 위 헤드라인 포인트 */
+    --color-accent-ink:  #171310;   /* 앰버 위에 올라가는 텍스트 */
+
+    --radius-sm: 10px;
+    --radius-md: 16px;
+    --radius-lg: 24px;
+    --radius-pill: 999px;
+
+    --shadow-card: 0 1px 2px rgba(24,24,27,.04), 0 8px 24px rgba(24,24,27,.06);
+    --shadow-pop:  0 12px 32px rgba(24,24,27,.16);
+
+    --container: 1180px;
+    --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Malgun Gothic', sans-serif;
+    /* 큰 제목 전용 고급스러운 세리프체 — 한글은 이 글꼴에 글자가 없어서 자동으로
+       --font-sans으로 대체된다 (브라우저가 알아서 처리, 별도 분기 불필요) */
+    --font-display: 'Fraunces', Georgia, 'Times New Roman', serif;
+}
+
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; height: 100%; }
+/* body를 세로 flex 컨테이너로 만들어서 footer가 항상 화면(뷰포트) 맨 아래에 붙게 한다.
+   내용이 짧은 탭(패널)이어도 footer 아래로 흰 배경이 보이지 않고, 내용이 길어지면
+   자동으로 늘어난다 — 화면 크기·내용 길이가 바뀔 때마다 별도 계산 없이 자동 대응된다. */
+body {
+    margin: 0;
+    min-height: 100%;
+    display: flex;
+    flex-direction: column;
+    font-family: var(--font-sans);
+    color: var(--color-text);
+    background: var(--color-bg-dark);
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+}
+body > main { flex: 1 0 auto; background: var(--color-bg); }
+body > .nav, body > .footer { flex-shrink: 0; }
+/* 홈 화면(탭 5개)에서는 지금 보이는 탭(.panel.is-active) 하나가 <main>을 통째로
+   채워야 한다 — 안 그러면 탭 내용이 화면보다 짧을 때 <main>의 흰 배경이 탭의
+   어두운 배경 아래로 삐져나와 흰 띠처럼 보인다. (다른 페이지는 영향 없음) */
+body.page-home main {
+    display: flex;
+    flex-direction: column;
+    /* body > main 규칙이 준 흰 배경을 여기서 지워야, 아래 body.page-home에 준
+       고정 그라데이션 배경이 이 <main> 뒤로 그대로 비쳐 보인다 */
+    background: transparent;
+}
+/* 탭 내용(카드/폼 등)이 화면 위쪽에 쏠려 보이지 않도록, 지금 보이는 탭을 세로 방향
+   가운데 정렬한다. flex-shrink가 0(= "flex: 1 0 auto"의 0)이라서 내용이 화면보다 길면
+   패널이 내용 크기만큼 자연스럽게 늘어나고(=기존처럼 정상적으로 스크롤), 내용이 화면보다
+   짧을 때만 남는 공간의 가운데로 이동한다 — 화면 크기·내용 길이가 달라져도 별도 계산 없이
+   자동으로 반응한다. */
+body.page-home .panel.is-active {
+    flex: 1 0 auto;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+/* 홈 화면 전용: 네비게이션 바 → 탭 내용 → 풋터까지 색이 끊기지 않고 하나로 이어지도록,
+   그라데이션+블루프린트 배경을 패널이나 풋터 각자가 아니라 body 하나에만 준다
+   (background-attachment: fixed 라서 화면 크기 기준으로 고정되고, 스크롤하거나 탭을
+   바꿔도 이음새 없이 항상 똑같이 보인다). 네비(.nav)는 반투명이라 이 배경이 그대로
+   비쳐 보이고, 아래 .panel--brand-bg / body.page-home .footer 에서 자체 배경을
+   비워서 이 body 배경이 그대로 통과되게 한다. */
+body.page-home {
+    background-color: #101012;
+    background-image:
+        linear-gradient(180deg, rgba(16,16,18,.98) 0%, rgba(27,20,12,.9) 50%, rgba(16,16,18,.98) 100%),
+        url('../images/blueprint-building.svg'),
+        url('../images/blueprint-grid.svg');
+    background-repeat: no-repeat, no-repeat, repeat;
+    background-attachment: fixed, fixed, fixed;
+    background-position: center, right -20px bottom -10px, left top;
+    background-size: cover, 640px auto, 72px 72px;
+}
+body.page-home .footer { background: transparent; }
+img { max-width: 100%; display: block; }
+a { color: inherit; text-decoration: none; }
+ul { list-style: none; margin: 0; padding: 0; }
+h1, h2, h3, p { margin: 0; }
+/* 한글 버전에서는 단어 중간이 아니라 어절 단위로 줄바꿈되게 (자연스러운 한글 개행) */
+html[lang="ko"] h1, html[lang="ko"] h2, html[lang="ko"] h3 { word-break: keep-all; }
+button { font-family: inherit; cursor: pointer; }
+
+.container { max-width: var(--container); margin: 0 auto; padding: 0 24px; }
+
+.eyebrow {
+    display: inline-block;
+    font-size: 12.5px;
+    font-weight: 700;
+    letter-spacing: .16em;
+    text-transform: uppercase;
+    color: var(--color-accent-warm);
+    margin-bottom: 8px;
+}
+.section--dark .eyebrow { color: var(--color-accent); }
+
+/* ---------- 버튼 / 배지 ---------- */
+.btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 14px 26px;
+    border-radius: var(--radius-pill);
+    font-weight: 700;
+    font-size: 14.5px;
+    border: 1px solid transparent;
+    transition: transform .15s ease, opacity .15s ease;
+    white-space: nowrap;
+}
+.btn:hover { opacity: .88; }
+.btn--sm { padding: 10px 18px; font-size: 13.5px; }
+.btn--primary { background: var(--color-text); color: #fff; }
+.btn--accent { background: var(--color-accent); color: var(--color-accent-ink); }
+.btn--outline {
+    background: transparent;
+    border-color: rgba(255,255,255,.35);
+    color: inherit;
+}
+.btn--outline-dark { border-color: rgba(24,24,27,.2); color: var(--color-text); }
+
+.pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 16px;
+    border-radius: var(--radius-pill);
+    background: var(--color-bg-cream);
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--color-text);
+    border: 1px solid var(--color-border);
+}
+.tag {
+    display: inline-flex;
+    padding: 6px 13px;
+    border-radius: var(--radius-pill);
+    background: var(--color-bg-cream);
+    font-size: 12.5px;
+    font-weight: 600;
+    color: var(--color-text-muted);
+}
+.badge { font-size: 10.5px; font-weight: 700; padding: 2px 8px; border-radius: var(--radius-pill); }
+.badge--soon { background: rgba(242,183,5,.16); color: #97650b; }
+
+/* ---------- 상단 네비게이션 ---------- */
+.nav {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: rgba(16,16,18,.72);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+}
+.nav__inner {
+    max-width: var(--container);
+    margin: 0 auto;
+    padding: 18px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+}
+.nav__logo {
+    font-weight: 800;
+    letter-spacing: .04em;
+    font-size: 17px;
+    color: #fff;
+    flex-shrink: 0;
+}
+.nav__menu { display: flex; align-items: center; gap: 4px; flex: 1; justify-content: center; }
+.nav__link {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    background: transparent;
+    border: none;
+    color: rgba(255,255,255,.82);
+    font-size: 14.5px;
+    font-weight: 600;
+    padding: 10px 18px;
+    border-radius: var(--radius-pill);
+    transition: background .15s ease, color .15s ease;
+}
+.nav__link:hover { background: rgba(255,255,255,.08); color: #fff; }
+.nav__link--active { color: var(--color-accent-ink); background: var(--color-accent); }
+
+.nav__actions { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
+.nav__lang {
+    background: transparent;
+    border: 1px solid rgba(255,255,255,.24);
+    color: #fff;
+    font-size: 12.5px;
+    font-weight: 600;
+    padding: 8px 12px;
+    border-radius: var(--radius-pill);
+}
+.nav__actions .btn--primary { background: var(--color-accent); color: var(--color-accent-ink); }
+
+.nav__burger {
+    display: none;
+    width: 38px; height: 38px;
+    background: rgba(255,255,255,.08);
+    border: none;
+    border-radius: 10px;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+}
+.nav__burger span { width: 18px; height: 2px; background: #fff; border-radius: 2px; }
+
+.nav__mobile {
+    display: none;
+    flex-direction: column;
+    gap: 2px;
+    padding: 8px 20px 22px;
+    border-top: 1px solid rgba(255,255,255,.08);
+}
+.nav__mobile-lang {
+    display: inline-flex;
+    align-self: flex-start;
+    margin-top: 14px;
+    padding: 8px 14px;
+    border: 1px solid rgba(255,255,255,.24);
+    border-radius: var(--radius-pill);
+    color: #fff;
+    font-size: 13px;
+    font-weight: 600;
+}
+.nav__mobile-group { font-size: 11px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--color-text-inverse-muted); margin: 14px 0 4px; }
+.nav__mobile-link { display: flex; align-items: center; gap: 8px; padding: 12px 4px; color: #fff; font-size: 16px; font-weight: 700; border-bottom: 1px solid rgba(255,255,255,.08); }
+.nav__mobile-link--active { color: var(--color-accent); }
+.nav__mobile.is-open { display: flex; }
+
+@media (max-width: 960px) {
+    .nav__menu, .nav__actions .btn, .nav__lang { display: none; }
+    .nav__burger { display: flex; }
+}
+
+/* ---------- 공통 섹션 레이아웃 ---------- */
+.section { padding: 96px 0; }
+
+/* 탭 패널 (홈 화면 — 한 번에 하나만 보임, 탭을 눌러 전환)
+   2026-08-12: 탭을 누르면(또는 #문의하기 같은 해시가 붙은 링크로 바로 들어오면)
+   app.js가 `location.hash`를 바꾸는데, 이때 브라우저가 "그 id를 가진 요소로
+   스크롤"하는 기본 동작이 같이 실행된다. 문제는 상단 네비(.nav)가
+   `position: sticky`라서 화면에 계속 떠 있는데, 브라우저의 기본 스크롤 계산은
+   이 sticky 네비의 높이를 모르고 요소를 화면 맨 위(0)에 딱 맞춰버린다 — 그 결과
+   탭 내용의 위쪽 80px 정도가 네비 뒤에 가려지고, 전체적으로 살짝 아래로
+   스크롤된 상태가 되어 "내용이 위로 쏠리고 아래쪽에 어색한 빈 공간이 남는"
+   현상이 생겼다. `scroll-margin-top`을 네비 높이만큼 주면, 브라우저가 스크롤할
+   때 그만큼 여유를 두고 멈춰서(사실상 탭 전환 시 전혀 스크롤이 필요 없는
+   경우엔 스크롤 자체가 안 일어난다) 이 문제가 해결된다. 상세 페이지의
+   `.hero`에서 이미 같은 이유로 84px를 쓰고 있어서(margin-top:-84px 참고)
+   동일한 값으로 맞췄다. */
+.panel { display: none; padding: 48px 0 80px; scroll-margin-top: 84px; }
+.panel.is-active { display: block; }
+.section--tight { padding: 72px 0; }
+.section--cream { background: var(--color-bg-cream); }
+.section--dark {
+    background: var(--color-bg-dark);
+    color: var(--color-text-inverse);
+    border-radius: var(--radius-lg);
+}
+.section--dark .section-head p,
+.section--dark p { color: var(--color-text-inverse-muted); }
+.section-head { max-width: 640px; margin: 0 0 clamp(14px, 3vh, 26px); }
+.section-head h2 { font-family: var(--font-display); font-size: clamp(28px, 3.4vw, 40px); font-weight: 700; line-height: 1.18; letter-spacing: -.01em; }
+.section-head__intro { margin-top: 6px; color: var(--color-text-muted); max-width: 560px; }
+.section-head--split { max-width: none; display: flex; align-items: flex-end; justify-content: space-between; gap: 32px; flex-wrap: wrap; }
+.section-head--split p { max-width: 320px; color: var(--color-text-muted); }
+
+/* ---------- 히어로 ---------- */
+.hero {
+    position: relative;
+    min-height: 92vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    background: linear-gradient(180deg, rgba(8,8,9,.55), rgba(8,8,9,.82)), var(--color-bg-dark) center/cover no-repeat;
+    color: #fff;
+    margin-top: -84px;
+    padding-top: 84px;
+}
+.hero__inner { max-width: 720px; padding: 0 24px; }
+.hero h1 { font-family: var(--font-display); font-size: clamp(40px, 6vw, 68px); font-weight: 700; line-height: 1.08; letter-spacing: -.02em; }
+.hero h1 .accent { color: var(--color-accent); }
+.hero p { margin: 26px auto 0; max-width: 560px; color: rgba(255,255,255,.72); font-size: 17px; }
+.hero .btn { margin-top: 34px; }
+
+/* ---------- About ---------- */
+/* 2026-08-12: 문의하기 탭처럼 회사소개 탭도 화면 안에 딱 맞아야 세로 가운데 정렬이
+   효과가 있어서(=패널이 화면보다 크면 정렬 대신 그냥 위에서부터 흐름), 글 칸을 더
+   넓혀 줄바꿈 줄 수를 줄이고(1fr 1fr → 1.15fr .85fr) 여백도 같이 줄였다. */
+.about { display: grid; grid-template-columns: 1.15fr .85fr; gap: 48px; align-items: center; }
+.about__copy h2 { font-family: var(--font-display); font-size: clamp(28px, 3.6vw, 42px); font-weight: 700; line-height: 1.2; margin-bottom: 14px; }
+.about__copy h2 .accent { color: var(--color-accent-warm); display: block; }
+.about__copy p { color: var(--color-text-muted); margin-bottom: 10px; font-size: 15.5px; }
+.about__pills { display: flex; flex-wrap: wrap; gap: 10px; margin: 16px 0 20px; }
+.about__media img { border-radius: var(--radius-lg); }
+.media-placeholder {
+    border-radius: var(--radius-lg);
+    aspect-ratio: 4 / 3;
+    background: linear-gradient(135deg, var(--color-bg-cream), #ece4d6);
+    display: flex; align-items: center; justify-content: center;
+    color: var(--color-text-soft);
+    font-size: 13px;
+    font-weight: 600;
+    text-align: center;
+    padding: 24px;
+}
+/* 회사소개 탭 실사진 (2026-08-13 추가) — 예전엔 "사진 준비되면 교체" 안내
+   박스(.media-placeholder)였는데, imge/메인 이미지.png(실제 건축 사진)가
+   생겨서 그 자리에 넣었다. .media-placeholder와 동일한 4:3 비율·둥근 모서리를
+   유지해서 레이아웃은 그대로, 안내 텍스트 박스만 실사진으로 바뀐 것처럼
+   보이게 했다. */
+.about__media-photo {
+    display: block;
+    width: 100%;
+    aspect-ratio: 4 / 3;
+    object-fit: cover;
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-pop);
+}
+
+/* ---------- 홈 화면 5개 탭 공통 고급스러운 배경 ----------
+   업체가 "건축 설계" 회사라는 점에 맞춰, 실제 사진 대신 아주 옅은 금색
+   설계도면(블루프린트) 느낌의 라인아트 + 격자 패턴을 짙은 다크 배경 위에 얹었다.
+   상단 네비게이션(.nav)도 어두운 색이라 이 배경과 자연스럽게 이어져 보인다.
+   회사소개 탭에서 시작했던 디자인을 나머지 4개 탭(건축/디자인/솔루션/문의하기)에도
+   동일하게 적용한 것 — index.php의 5개 <section class="panel"> 전부에 이 클래스가 붙는다. */
+.panel--brand-bg {
+    /* 배경은 이제 body.page-home 하나가 담당한다 (위 body.page-home 규칙 참고) —
+       패널마다 따로 배경을 그리면 탭이 바뀔 때·풋터로 넘어갈 때 이음새가 보였다.
+       여기서는 글자색만 밝게 바꿔준다. */
+    position: relative;
+    color: var(--color-text-inverse);
+    /* 2026-08-12: 문의하기 탭이 화면보다 길어서 스크롤이 생기는 문제 때문에
+       위아래 여백을 계속 줄였다 (88/96 → 48/56 → 36/44 → 28/36) — 모든 탭에
+       똑같이 적용되어 전체적으로 스크롤이 덜 필요해지는 효과도 같이 있다.
+       이후: 화면이 낮을 때만 저절로 줄어들고, 화면이 넉넉하면 원래의 여유 있는
+       여백(약 40/56)으로 돌아오도록 vh 기준 clamp()로 바꿨다 — 특정 픽셀 값
+       하나에 억지로 맞추지 않고 실제 창 높이에 맞춰 자연스럽게 반응한다. */
+    padding: clamp(24px, 5vh, 40px) 0 clamp(28px, 6vh, 56px);
+}
+.panel--brand-bg .eyebrow { color: var(--color-accent); }
+.panel--brand-bg .about__copy h2 { color: #fff; }
+.panel--brand-bg .about__copy h2 .accent { color: var(--color-accent); }
+.panel--brand-bg .about__copy p { color: var(--color-text-inverse-muted); }
+.panel--brand-bg .pill {
+    background: rgba(255,255,255,.06);
+    border: 1px solid rgba(255,255,255,.16);
+    color: var(--color-text-inverse);
+}
+.panel--brand-bg .media-placeholder {
+    background: linear-gradient(135deg, rgba(255,255,255,.07), rgba(255,255,255,.02));
+    border: 1px solid rgba(242,183,5,.28);
+    color: var(--color-text-inverse-muted);
+}
+/* 건축/디자인/솔루션/문의하기 탭의 상단 제목 영역(.section-head) */
+.panel--brand-bg .section-head h2 { color: #fff; }
+.panel--brand-bg .section-head__intro { color: var(--color-text-inverse-muted); }
+/* 문의하기 탭의 연락처 목록(이메일/전화/인스타/영업시간) */
+.panel--brand-bg .contact__info-item { border-bottom-color: rgba(255,255,255,.14); }
+.panel--brand-bg .contact__info-item .label { color: var(--color-text-inverse-muted); }
+.panel--brand-bg .contact__info-item .value { color: var(--color-text-inverse); }
+/* 문의하기 탭의 문의 폼(.card)도 순백색 대신 크림색으로 — 다른 상세 페이지의 .card는
+   원래 흰 배경 그대로 유지해야 하므로, "어두운 홈 탭 안에 있을 때만" 크림색으로
+   바뀌도록 .panel--brand-bg 안에서만 범위를 좁혀서 적용한다. */
+.panel--brand-bg .card { background: var(--color-bg-cream); border-color: rgba(16,16,18,.08); }
+/* 문의하기 폼(#contactForm)만 콕 집어서 안쪽 여백을 조절 — 다른 페이지의 .card는
+   그대로 두고 싶어서 클래스가 아니라 이 폼의 id로만 범위를 좁혔다.
+   2026-08-12: 너무 빡빡했던 여백을 다시 넉넉하게 되돌리되, 화면이 낮을 때는
+   vh 기준으로 저절로 줄어들도록 clamp()를 썼다. */
+#contactForm { padding: clamp(18px, 4vh, 32px); }
+
+/* ---------- 카드 그리드 (건축설계, 그래픽디자인 프로젝트 등) ---------- */
+.card-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 24px; }
+.card-grid--3 { grid-template-columns: repeat(3, 1fr); }
+.card-grid--4 { grid-template-columns: repeat(4, 1fr); }
+
+/* 탭 카드 (홈 화면의 건축/디자인/솔루션 카드) */
+.service-card {
+    display: flex;
+    flex-direction: column;
+    /* 순백색 대신 따뜻한 크림색 — 어두운 배경의 금색 톤과 더 잘 어울린다 */
+    background: var(--color-bg-cream);
+    /* 카드 배경색과 무관하게 글자색은 항상 어두운 기본색으로 고정한다.
+       안 그러면 어두운 배경(.panel--brand-bg) 안에 있을 때 글자색이 밝은색을
+       물려받아서(상속) 카드 위에 카드색과 비슷한 글씨가 되어 잘 안 보이는 문제가 생긴다. */
+    color: var(--color-text);
+    border: 1px solid rgba(16,16,18,.08);
+    border-radius: var(--radius-lg);
+    padding: 30px;
+    transition: transform .15s ease, box-shadow .15s ease, border-color .15s ease;
+}
+.service-card:hover { transform: translateY(-3px); box-shadow: var(--shadow-card); border-color: transparent; }
+
+/* 아이콘 + 타이틀 가로 배치 (2026-08-13: 아이콘 아래에 제목이 쌓이던 걸 아이콘
+   옆에 제목이 오도록 변경). index.php에서 .service-card__icon과 h3를
+   .service-card__head로 감싸서 이 규칙이 둘을 한 줄에 정렬한다. */
+.service-card__head {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 10px;
+}
+.service-card__icon {
+    flex-shrink: 0;
+    width: 46px; height: 46px;
+    border-radius: 12px;
+    /* 카드 자체가 크림색으로 바뀌어서, 아이콘 배지는 흰색으로 살짝 대비를 준다 */
+    background: #fff;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px;
+}
+.service-card h3 { font-size: 18px; font-weight: 700; margin-bottom: 0; }
+.service-card p { color: var(--color-text-muted); font-size: 14px; margin-bottom: 18px; flex: 1; }
+.service-card__cta { font-size: 13.5px; font-weight: 700; color: var(--color-accent-warm); }
+
+/* 카드 위쪽 실사진 (2026-08-13 추가) — 카드 패딩(30px)만큼 음수 마진을 줘서 사진이
+   카드 좌우/위쪽 끝까지 꽉 차 보이게 하고, 위쪽 모서리만 카드와 같은 둥근 정도로
+   맞췄다(아래쪽은 사각형인 채로 두고 그 아래 아이콘/제목이 이어지는 모양).
+   position:relative + ::after로 사진 아래쪽에 카드 크림색으로 자연스럽게 번지는
+   그라데이션을 깔아서, 사진이 뚝 잘린 느낌 없이 카드 본문과 부드럽게 이어지도록
+   했다 (2026-08-13, "부드럽게 수정해줘" 요청 반영 — 모든 카드 사진에 공통 적용). */
+.service-card__photo {
+    position: relative;
+    margin: -30px -30px 18px -30px;
+    border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+    overflow: hidden;
+}
+.service-card__photo::after {
+    content: '';
+    position: absolute;
+    left: 0; right: 0; bottom: 0;
+    height: 46px;
+    background: linear-gradient(to bottom, rgba(250,247,240,0) 0%, var(--color-bg-cream) 100%);
+    pointer-events: none;
+}
+.service-card__photo img {
+    width: 100%;
+    height: 168px;
+    object-fit: cover;
+    display: block;
+}
+
+/* 2026-08-13 (2차 수정): 디자인 카드 2장(그래픽/영상)은 원본 사진 자체에
+   제목·설명·아이콘까지 다 박혀있는 "포스터형" 이미지였는데, 건축 카드의 깔끔한
+   실사진들과 나란히 두니 확실히 이질감이 있었다(사용자 피드백: "건축 카테고리
+   카드에 이미지는 아주 자연 스러워 하지만 디자인 카테고리에 그래픽&상업 카드의
+   이미지는 자연스럽지 않아"). 높이/기준점만 조정하는 미봉책 대신, 원본 이미지에서
+   글자·아이콘이 없는 순수 제품/장비 사진 영역만 다시 잘라내 파일 자체를
+   교체했다 — 그래픽 카드는 오른쪽의 문구류(팬톤 컬러칩·노트·명함·펜) 플랫레이
+   부분만, 영상 카드는 오른쪽의 드론+시네마 카메라 촬영 장비 부분만 남겼다.
+   이제 건축 카드와 똑같은 기본 168px cover 크롭만으로도 자연스럽게 보인다.
+   (디자인 탭 전용 object-position 오버라이드는 더 이상 필요 없어서 제거함.) */
+
+/* 상세 페이지 상단 (뒤로가기 + 제목) */
+.detail-hero { padding: 40px 0 8px; }
+.detail-back {
+    display: inline-flex;
+    align-items: center;
+    font-size: 13.5px;
+    font-weight: 600;
+    color: var(--color-text-soft);
+    margin-bottom: 18px;
+}
+.detail-back:hover { color: var(--color-text); }
+.detail-hero h1 { font-family: var(--font-display); font-size: clamp(26px, 3.6vw, 38px); font-weight: 700; margin-top: 6px; }
+.detail-hero__intro { margin-top: 12px; color: var(--color-text-muted); max-width: 600px; font-size: 15.5px; }
+.detail-cta { margin-top: 36px; }
+
+/* 상세 페이지 상단의 실사진 배너 (2026-08-13 추가) — 제목/소개문은 그대로 밝은 배경
+   위에 검정 글씨로 두고(사진 위에 흰 글씨를 얹는 방식은 사진이 밝아서 대비가 잘 안
+   나올 수 있어 피했다), 그 아래에 큼직하게 사진을 넣는 방식. 어떤 상세 페이지에
+   적용해도 안전하게 동작하도록 컨테이너 폭까지 꽉 채우고 모서리를 둥글렸다. */
+.detail-hero__photo {
+    margin-top: 24px;
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    box-shadow: var(--shadow-pop);
+}
+.detail-hero__photo img {
+    width: 100%;
+    height: clamp(200px, 32vw, 380px);
+    object-fit: cover;
+    display: block;
+}
+
+/* 2026-08-13: 건축/디자인 탭에 카테고리별 실사진을 배경으로 넣었었는데(위 커밋
+   참고), 사용자가 다시 원래의 공용 그라데이션+블루프린트 배경으로 되돌려
+   달라고 해서 이 두 규칙은 제거했다. 실사진은 이제 배경이 아니라 카드 위쪽
+   사진(.service-card__photo)으로만 쓴다 — 5개 탭 전부 다시 body.page-home의
+   공용 배경 하나로 통일됨. */
+
+/* 어플(apps) 카테고리 — 비어있을 때 안내 상태 */
+.empty-state {
+    text-align: center;
+    padding: 64px 24px;
+    background: var(--color-bg-cream);
+    border-radius: var(--radius-lg);
+}
+.empty-state__icon { font-size: 34px; margin-bottom: 14px; }
+.empty-state h3 { font-size: 19px; font-weight: 700; margin-bottom: 8px; }
+.empty-state p { color: var(--color-text-muted); font-size: 14.5px; max-width: 420px; margin: 0 auto; }
+.app-card { text-decoration: none; }
+.app-card--soon { opacity: .6; cursor: default; }
+.app-card--soon:hover { transform: none; box-shadow: none; border-color: var(--color-border); }
+.card {
+    background: #fff;
+    /* .service-card와 같은 이유로 글자색을 항상 어두운 기본색으로 고정 (문의하기 폼이
+       어두운 배경 패널 안에 있어도 라벨/제목 글씨가 항상 잘 보이게) */
+    color: var(--color-text);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    padding: 32px;
+}
+.card--cream { background: var(--color-bg-cream); border-color: transparent; }
+.card__icon {
+    width: 44px; height: 44px;
+    border-radius: 12px;
+    background: var(--color-bg-cream);
+    display: flex; align-items: center; justify-content: center;
+    margin-bottom: 20px;
+    color: var(--color-text);
+}
+.card h3 { font-size: 19px; font-weight: 700; margin-bottom: 10px; }
+.card p { color: var(--color-text-muted); font-size: 14.5px; margin-bottom: 18px; }
+.card__tags { display: flex; flex-wrap: wrap; gap: 8px; }
+
+/* ---------- 프로세스 (다크 패널, 4단계) ---------- */
+.process { padding: 48px; }
+.process-head { display: flex; justify-content: space-between; align-items: flex-end; gap: 24px; flex-wrap: wrap; margin-bottom: 40px; }
+.process-head h2 { font-size: clamp(24px, 3vw, 32px); font-weight: 800; }
+.process-steps { display: grid; grid-template-columns: repeat(4, 1fr); gap: 28px; position: relative; }
+.process-step__top { display: flex; align-items: center; gap: 12px; margin-bottom: 18px; }
+.process-step__num { font-size: 34px; font-weight: 800; color: rgba(255,255,255,.16); }
+.process-step__icon {
+    width: 34px; height: 34px;
+    border-radius: 9px;
+    background: rgba(242,183,5,.14);
+    color: var(--color-accent);
+    display: flex; align-items: center; justify-content: center;
+}
+.process-step h4 { font-size: 15.5px; font-weight: 700; margin-bottom: 8px; }
+.process-step p { font-size: 13.5px; color: var(--color-text-inverse-muted); }
+.process-foot {
+    margin-top: 36px;
+    padding-top: 28px;
+    border-top: 1px solid var(--color-border-dark);
+    display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 18px;
+    font-size: 13.5px; color: var(--color-text-inverse-muted);
+}
+.process-foot strong { color: #fff; }
+
+/* ---------- 자동화 소프트웨어 ---------- */
+.automation { display: grid; grid-template-columns: 1.1fr 1fr; gap: 56px; }
+.automation__feature { display: flex; gap: 16px; padding: 22px 0; border-bottom: 1px solid var(--color-border); }
+.automation__feature:last-child { border-bottom: none; }
+.automation__feature-icon {
+    width: 40px; height: 40px; flex-shrink: 0;
+    border-radius: 11px;
+    background: var(--color-bg-cream);
+    display: flex; align-items: center; justify-content: center;
+}
+.automation__feature h4 { font-size: 15.5px; font-weight: 700; margin-bottom: 6px; }
+.automation__feature p { font-size: 14px; color: var(--color-text-muted); }
+.automation__apps { background: var(--color-bg-cream); border-radius: var(--radius-lg); padding: 28px; margin-top: 8px; }
+.automation__apps p.heading { font-weight: 700; margin-bottom: 14px; font-size: 14px; }
+.automation__apps ul { display: flex; flex-wrap: wrap; gap: 8px; }
+.automation__cta {
+    margin-top: 22px;
+    background: var(--color-text);
+    color: #fff;
+    border-radius: var(--radius-lg);
+    padding: 26px;
+}
+.automation__cta p { font-size: 14px; color: rgba(255,255,255,.72); margin: 6px 0 16px; }
+.automation__cta h4 { font-size: 17px; font-weight: 700; }
+
+/* ---------- 비즈니스 컨설팅 6카드 ---------- */
+.consulting-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 22px; }
+.consulting-grid .card { padding: 26px; }
+.consulting-grid .card h3 { font-size: 16.5px; }
+.consulting-grid .card p { font-size: 13.5px; min-height: 66px; }
+
+/* ---------- Contact ----------
+   2026-08-12: 예전엔 900px 화면에 딱 맞추려고 여백을 너무 빡빡하게 줄여서 폼이
+   답답하고, 왼쪽 정보 목록과 오른쪽 폼 카드의 높이가 안 맞아 이질감(언밸런스)이
+   있었다. 그래서 (1) 다시 여유 있는 여백으로 되돌리고, (2) 두 칼럼을
+   `align-items: center`로 세로 가운데 맞춰서 균형 잡히게 하고, (3) 화면이 유독
+   낮을 때만 저절로 줄어들도록 vh 단위 clamp()를 써서 "능동 반응형"으로 만들었다
+   — 화면이 넉넉하면 여백이 넉넉해지고, 화면이 낮으면 알아서 줄어든다. */
+.contact { display: grid; grid-template-columns: .8fr 1.2fr; gap: 56px; align-items: center; }
+.contact__info-item { display: flex; gap: 14px; padding: clamp(6px, 1.6vh, 14px) 0; border-bottom: 1px solid var(--color-border); }
+.contact__info-item:last-child { border-bottom: none; }
+.contact__info-item .label { font-size: 12.5px; color: var(--color-text-soft); font-weight: 600; text-transform: uppercase; letter-spacing: .06em; }
+.contact__info-item .value { font-weight: 700; font-size: 15px; margin-top: 2px; }
+.form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(10px, 2vh, 18px); }
+.form-grid .field--full { grid-column: 1 / -1; }
+.field label { display: block; font-size: 13px; font-weight: 600; margin-bottom: clamp(3px, 0.8vh, 6px); }
+.field input, .field select, .field textarea {
+    width: 100%;
+    padding: clamp(9px, 1.6vh, 13px) 14px;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--color-border);
+    font-family: inherit;
+    font-size: 14.5px;
+    background: #fff;
+    color: var(--color-text);
+}
+.field textarea { resize: vertical; min-height: clamp(36px, 8vh, 76px); }
+.field input:focus, .field select:focus, .field textarea:focus { outline: 2px solid var(--color-accent); outline-offset: 1px; }
+.form-note { font-size: 12px; color: var(--color-text-soft); margin-top: clamp(4px, 1vh, 10px); }
+
+/* ---------- Footer ---------- */
+/* 2026-08-12: 전체 높이를 기존의 약 2/3 크기로 줄임 (여백 축소 + 줄간격을 살짝 좁힘) */
+.footer { background: var(--color-bg-dark); color: var(--color-text-inverse); padding: 40px 0 0; margin-top: 24px; line-height: 1.3; }
+.footer__inner {
+    max-width: var(--container); margin: 0 auto; padding: 0 24px 24px;
+    display: grid; grid-template-columns: 1.3fr 1fr 1fr; gap: 24px;
+}
+.footer__logo { font-weight: 800; font-size: 18px; margin-bottom: 8px; }
+.footer__tagline { color: var(--color-text-inverse-muted); font-size: 14px; max-width: 280px; }
+.footer__heading { font-size: 12.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: var(--color-text-inverse-muted); margin-bottom: 8px; }
+.footer__col { display: flex; flex-direction: column; gap: 6px; font-size: 14px; }
+.footer__col a { color: rgba(255,255,255,.78); }
+.footer__col a:hover { color: #fff; }
+.footer__soon { opacity: .5; }
+.footer__hours { color: rgba(255,255,255,.78); font-size: 14px; margin-top: 2px; }
+.footer__bottom {
+    border-top: 1px solid var(--color-border-dark);
+    padding: 12px 24px;
+    max-width: var(--container); margin: 0 auto;
+    display: flex; justify-content: space-between; flex-wrap: wrap; gap: 12px;
+    font-size: 12.5px; color: var(--color-text-inverse-muted);
+}
+.footer__legal { display: flex; gap: 18px; }
+.footer__legal a:hover { color: #fff; }
+
+/* ---------- 그래픽 디자인 페이지 전용 ---------- */
+.gd-hero { text-align: left; }
+.gd-projects { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 22px; }
+.gd-steps { display: grid; grid-template-columns: repeat(4, 1fr); gap: 22px; }
+.gd-step { background: var(--color-bg-cream); border-radius: var(--radius-lg); padding: 26px; }
+.gd-step .step-num { font-size: 12px; font-weight: 700; color: var(--color-accent-warm); letter-spacing: .08em; margin-bottom: 12px; }
+.gd-step h4 { font-size: 16px; font-weight: 700; margin-bottom: 8px; }
+.gd-step p { font-size: 13.5px; color: var(--color-text-muted); }
+.gd-cta { text-align: center; background: var(--color-bg-dark); color: #fff; border-radius: var(--radius-lg); padding: 64px 24px; }
+.gd-cta h2 { font-size: clamp(24px, 3.4vw, 34px); font-weight: 800; margin-bottom: 12px; }
+.gd-cta p { color: var(--color-text-inverse-muted); margin-bottom: 26px; }
+
+/* ---------- 반응형 ---------- */
+@media (max-width: 900px) {
+    .about, .automation, .contact { grid-template-columns: 1fr; }
+    .card-grid, .consulting-grid, .process-steps, .gd-steps { grid-template-columns: repeat(2, 1fr); }
+    .form-grid { grid-template-columns: 1fr; }
+    .footer__inner { grid-template-columns: 1fr 1fr; }
+}
+@media (max-width: 600px) {
+    .section { padding: 64px 0; }
+    .process { padding: 28px; }
+    .card-grid, .consulting-grid, .process-steps, .gd-steps { grid-template-columns: 1fr; }
+    .footer__inner { grid-template-columns: 1fr; }
+    .hero { min-height: 80vh; }
+    .panel--brand-bg { padding: 40px 0 48px; }
+    body.page-home {
+        background-size: cover, 380px auto, 56px 56px;
+        background-position: center, right -60px bottom -10px, left top;
+    }
+}
