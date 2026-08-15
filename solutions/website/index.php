@@ -3,6 +3,7 @@ require __DIR__ . '/../../config.php';
 $pageTitle = t('card.solutions.website.title') . ' | DESIGN DAN';
 $pageDescription = t('detail.solutions.website.intro');
 $activeNav = 'solutions';
+$isDetailPage = true;
 require __DIR__ . '/../../includes/header.php';
 
 $detailParentSlug = 'solutions';

@@ -3,6 +3,7 @@ require __DIR__ . '/../../config.php';
 $pageTitle = t('card.design.graphic.title') . ' | DESIGN DAN';
 $pageDescription = t('gd.hero_desc');
 $activeNav = 'design';
+$isDetailPage = true;
 require __DIR__ . '/../../includes/header.php';
 
 $detailParentSlug = 'design';
@@ -29,7 +30,7 @@ $detailIcon       = '🎨';
         </div>
 
         <h3 style="font-size:18px;font-weight:700;margin-bottom:6px;"><?= te('gd.projects_title') ?></h3>
-        <p style="color:var(--color-text-muted);font-size:14.5px;margin-bottom:6px;"><?= te('gd.projects_desc') ?></p>
+        <p style="color:var(--color-text-inverse-muted);font-size:14.5px;margin-bottom:6px;"><?= te('gd.projects_desc') ?></p>
         <div class="gd-projects">
             <span class="tag"><?= te('gd.tag1') ?></span>
             <span class="tag"><?= te('gd.tag2') ?></span>

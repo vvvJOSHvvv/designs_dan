@@ -56,11 +56,18 @@ $NAV_SERVICES = [
         ],
     ],
     [
-        'slug'      => 'contact',
-        'label_key' => 'nav.contact',
+        'slug'      => 'resources',
+        'label_key' => 'nav.resources',
         'items'     => [],
     ],
 ];
+
+/**
+ * 2026-08-14: "문의하기"를 상단 탭 목록에서 뺐다 (오른쪽 "문의하기" 버튼과 중복돼서).
+ * 실제 #contact 패널(index.php)과 findNavTab('contact') 호출은 그대로 남아있으니,
+ * data-tab="contact" 링크(예: 각 상세페이지의 "Get in Touch" 버튼)는 계속 정상 동작한다 —
+ * 탭 전환 JS(app.js)가 이 배열이 아니라 실제 .panel[data-panel] 요소를 기준으로 동작하기 때문.
+ */
 
 /** slug 로 상위 탭 데이터를 찾습니다 (상세 페이지의 "뒤로가기" 링크 만들 때 사용) */
 function findNavTab(string $slug): ?array

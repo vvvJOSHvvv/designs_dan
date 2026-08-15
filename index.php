@@ -114,6 +114,40 @@ $solutionsTab = findNavTab('solutions');
         </div>
     </section>
 
+    <!-- ============ 자료실 ============ -->
+    <section class="panel panel--brand-bg" id="resources" data-panel="resources">
+        <div class="container">
+            <div class="section-head">
+                <p class="eyebrow"><?= te('tab.resources.eyebrow') ?></p>
+                <h2><?= te('tab.resources.title') ?></h2>
+                <p class="section-head__intro"><?= te('tab.resources.intro') ?></p>
+            </div>
+            <div class="card-grid card-grid--3">
+                <?php foreach ($RESOURCE_CATEGORIES as $cat): ?>
+                    <?php
+                    $catName = $LANG === 'ko' ? $cat['name_ko'] : $cat['name_en'];
+                    $catDesc = $LANG === 'ko' ? $cat['desc_ko'] : $cat['desc_en'];
+                    ?>
+                    <div class="card resource-card">
+                        <div class="card__icon"><?= $cat['icon'] ?></div>
+                        <h3><?= htmlspecialchars($catName) ?></h3>
+                        <p><?= htmlspecialchars($catDesc) ?></p>
+                        <?php if (!empty($cat['files'])): ?>
+                            <ul class="resource-card__files">
+                                <?php foreach ($cat['files'] as $f): ?>
+                                    <?php $fileName = $LANG === 'ko' ? $f['name_ko'] : $f['name_en']; ?>
+                                    <li><a href="<?= asset('resources/' . $f['file']) ?>" download><?= htmlspecialchars($fileName) ?> ⬇</a></li>
+                                <?php endforeach; ?>
+                            </ul>
+                        <?php else: ?>
+                            <span class="badge badge--soon"><?= te('badge.soon') ?></span>
+                        <?php endif; ?>
+                    </div>
+                <?php endforeach; ?>
+            </div>
+        </div>
+    </section>
+
     <!-- ============ 문의하기 ============ -->
     <section class="panel panel--brand-bg" id="contact" data-panel="contact">
         <div class="container">
@@ -143,7 +177,7 @@ $solutionsTab = findNavTab('solutions');
                     </div>
                 </div>
 
-                <form class="card" id="contactForm" data-alert="<?= htmlspecialchars(t('contact.form.alert')) ?>">
+                <form class="card" id="contactForm" method="post" action="<?= url('/actions/inquiry-submit.php') ?>">
                     <div class="form-grid">
                         <div class="field">
                             <label for="cName"><?= te('contact.form.name') ?></label>
@@ -170,6 +204,11 @@ $solutionsTab = findNavTab('solutions');
                         <div class="field field--full">
                             <label for="contactMessage"><?= te('contact.form.message') ?> <span id="contactMessageCount" style="font-weight:400;color:var(--color-text-soft)">(0/500)</span></label>
                             <textarea id="contactMessage" name="message" maxlength="500" required></textarea>
+                        </div>
+                        <div class="field field--full">
+                            <label for="cPassword"><?= te('contact.form.password') ?></label>
+                            <input type="password" id="cPassword" name="password" autocomplete="new-password">
+                            <p class="field__hint"><?= te('contact.form.password_hint') ?></p>
                         </div>
                     </div>
                     <button type="submit" class="btn btn--primary" style="margin-top:10px;width:100%;justify-content:center;"><?= te('contact.form.submit') ?></button>

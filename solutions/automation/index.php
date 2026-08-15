@@ -3,6 +3,7 @@ require __DIR__ . '/../../config.php';
 $pageTitle = t('card.solutions.automation.title') . ' | DESIGN DAN';
 $pageDescription = t('erf.intro');
 $activeNav = 'solutions';
+$isDetailPage = true;
 require __DIR__ . '/../../includes/header.php';
 
 $detailParentSlug = 'solutions';
@@ -24,7 +25,7 @@ $detailIcon       = '⚙️';
 
         <div class="automation">
             <div>
-                <div class="automation__feature" style="border-top:1px solid var(--color-border);padding-top:22px;">
+                <div class="automation__feature" style="border-top:1px solid var(--color-border-dark);padding-top:22px;">
                     <div class="automation__feature-icon">💻</div>
                     <div>
                         <h4><?= te('erf.feature1.title') ?></h4>

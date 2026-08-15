@@ -1,7 +1,7 @@
 // DESIGN DAN — 공통 스크립트
 // 1) 모바일 햄버거 메뉴 열고 닫기
-// 2) 문의 폼 글자수 카운터(0/500) + 아주 기본적인 필수값 체크
-//    (실제 메일 발송 연동은 아직 없음 — 다음 단계에서 서버 처리 추가 예정, CLAUDE.md 참고)
+// 2) 문의 폼 글자수 카운터(0/500) — 폼 자체는 actions/inquiry-submit.php로 실제 제출됨
+//    (2026-08-14: 답변 게시판 추가하면서 진짜 저장되도록 바뀜, CLAUDE.md 참고)
 // 3) 한/영 전환 버튼: 페이지 이동 시 지금 보고 있던 섹션(#anchor)을 그대로 유지
 // 4) 홈 화면 탭 전환: 스크롤 없이 카드/섹션을 탭처럼 전환 (해시 기반, 뒤로가기 지원)
 
@@ -25,16 +25,10 @@ document.addEventListener('DOMContentLoaded', function () {
         update();
     }
 
-    var form = document.getElementById('contactForm');
-    if (form) {
-        form.addEventListener('submit', function (e) {
-            e.preventDefault();
-            // TODO: 실제 이메일 발송 연동 (예: PHPMailer, 또는 서버 API 호출)
-            alert(form.getAttribute('data-alert') || 'Submitted.');
-            form.reset();
-            if (counter) counter.textContent = '0/' + (message ? (message.getAttribute('maxlength') || 500) : 500);
-        });
-    }
+    // 2026-08-14: 문의 폼이 이제 실제로 서버(actions/inquiry-submit.php)에 저장되므로
+    // JS로 submit을 막고 alert만 띄우던 예전 방식은 제거했다. 폼은 그냥 평범하게
+    // 제출되고(action="/actions/inquiry-submit.php"), 서버가 처리 후 답변 게시판의
+    // 방금 쓴 글로 리다이렉트한다.
 
     // 언어 전환 링크는 서버에서 경로+?lang= 까지만 만들어주므로,
     // 지금 스크롤 중인 섹션(#about, #contact 등)이 있으면 여기서 그대로 붙여준다.

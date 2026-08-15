@@ -10,6 +10,7 @@
             <?php foreach ($NAV_SERVICES as $service): ?>
                 <a href="<?= url('/') ?>#<?= htmlspecialchars($service['slug']) ?>"><?= htmlspecialchars(t($service['label_key'])) ?></a>
             <?php endforeach; ?>
+            <a href="<?= url('/answers/') ?>"><?= htmlspecialchars(t('nav.answers')) ?></a>
         </div>
 
         <div class="footer__col">
@@ -26,7 +27,7 @@
         <div class="footer__legal">
             <a href="#"><?= htmlspecialchars(t('footer.privacy')) ?></a>
             <a href="#"><?= htmlspecialchars(t('footer.terms')) ?></a>
-            <a href="#"><?= htmlspecialchars(t('footer.staff_login')) ?></a>
+            <a href="<?= url('/admin/login.php') ?>"><?= htmlspecialchars(t('footer.staff_login')) ?></a>
         </div>
     </div>
 </footer>

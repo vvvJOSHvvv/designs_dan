@@ -3,6 +3,7 @@ require __DIR__ . '/../../config.php';
 $pageTitle = t('detail.design.video.title') . ' | DESIGN DAN';
 $pageDescription = t('detail.design.video.intro');
 $activeNav = 'design';
+$isDetailPage = true;
 require __DIR__ . '/../../includes/header.php';
 
 $detailParentSlug = 'design';

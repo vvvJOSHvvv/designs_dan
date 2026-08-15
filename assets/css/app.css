@@ -65,6 +65,10 @@ body.page-home main {
        고정 그라데이션 배경이 이 <main> 뒤로 그대로 비쳐 보인다 */
     background: transparent;
 }
+/* 2026-08-14: 상세 페이지(9개)도 같은 이유로 흰 배경을 지운다. 다만 상세 페이지는
+   탭처럼 세로 가운데 정렬할 필요가 없어서(카드가 여러 개라 자연스럽게 위→아래로
+   흐르면 됨) body.page-home .panel.is-active 같은 flex 정렬 규칙은 가져오지 않는다. */
+body.page-detail main { background: transparent; }
 /* 탭 내용(카드/폼 등)이 화면 위쪽에 쏠려 보이지 않도록, 지금 보이는 탭을 세로 방향
    가운데 정렬한다. flex-shrink가 0(= "flex: 1 0 auto"의 0)이라서 내용이 화면보다 길면
    패널이 내용 크기만큼 자연스럽게 늘어나고(=기존처럼 정상적으로 스크롤), 내용이 화면보다
@@ -83,7 +87,8 @@ body.page-home .panel.is-active {
    바꿔도 이음새 없이 항상 똑같이 보인다). 네비(.nav)는 반투명이라 이 배경이 그대로
    비쳐 보이고, 아래 .panel--brand-bg / body.page-home .footer 에서 자체 배경을
    비워서 이 body 배경이 그대로 통과되게 한다. */
-body.page-home {
+body.page-home,
+body.page-detail {
     background-color: #101012;
     background-image:
         linear-gradient(180deg, rgba(16,16,18,.98) 0%, rgba(27,20,12,.9) 50%, rgba(16,16,18,.98) 100%),
@@ -94,7 +99,23 @@ body.page-home {
     background-position: center, right -20px bottom -10px, left top;
     background-size: cover, 640px auto, 72px 72px;
 }
-body.page-home .footer { background: transparent; }
+body.page-home .footer, body.page-detail .footer { background: transparent; }
+/* 2026-08-14: 상세 페이지 9개도 홈과 동일한 다크 블루프린트 배경으로 통일
+   ("카드를 누르고 들어왔을 때 배경이 흰색" 문제 → "전체 다크로 통일"로 결정).
+   body 기본 텍스트색(--color-text, 어두운색)을 밝은색으로 뒤집어서, 카드/크림박스
+   같은 자체 배경이 없는 요소(제목, 소개문 등)가 어두운 배경 위에서도 잘 보이게 한다.
+   .card/.card--cream/.gd-step/.automation__apps/.empty-state 처럼 자체 밝은 배경을
+   가진 요소들은 각자 color:var(--color-text)를 컨테이너에 직접 지정해서 이 상속을
+   덮어쓴다 (아래 관련 규칙들 참고). */
+body.page-detail { color: var(--color-text-inverse); }
+body.page-detail .detail-back { color: var(--color-text-inverse-muted); }
+body.page-detail .detail-back:hover { color: #fff; }
+body.page-detail .detail-hero__intro { color: var(--color-text-inverse-muted); }
+body.page-detail .detail-hero .eyebrow,
+body.page-detail .section:not(.section--cream) .eyebrow { color: var(--color-accent); }
+body.page-detail .section-head__intro { color: var(--color-text-inverse-muted); }
+body.page-detail .automation__feature { border-bottom-color: var(--color-border-dark); }
+body.page-detail .automation__feature p { color: var(--color-text-inverse-muted); }
 img { max-width: 100%; display: block; }
 a { color: inherit; text-decoration: none; }
 ul { list-style: none; margin: 0; padding: 0; }
@@ -255,7 +276,10 @@ button { font-family: inherit; cursor: pointer; }
 .nav__mobile.is-open { display: flex; }
 
 @media (max-width: 960px) {
-    .nav__menu, .nav__actions .btn, .nav__lang { display: none; }
+    /* 2026-08-14: 답변 링크(.nav__answers-link)를 문의하기 버튼 옆(.nav__actions)으로
+       옮기면서 여기도 같이 숨겨야 하는데 빠뜨리면, 모바일에서 버거 메뉴 옆에 "답변"이
+       중복으로 떠 있게 된다 (모바일 드롭다운 메뉴 안에 이미 답변 링크가 따로 있음). */
+    .nav__menu, .nav__actions .btn, .nav__lang, .nav__answers-link { display: none; }
     .nav__burger { display: flex; }
 }
 
@@ -278,7 +302,7 @@ button { font-family: inherit; cursor: pointer; }
 .panel { display: none; padding: 48px 0 80px; scroll-margin-top: 84px; }
 .panel.is-active { display: block; }
 .section--tight { padding: 72px 0; }
-.section--cream { background: var(--color-bg-cream); }
+.section--cream { background: var(--color-bg-cream); color: var(--color-text); }
 .section--dark {
     background: var(--color-bg-dark);
     color: var(--color-text-inverse);
@@ -523,6 +547,9 @@ button { font-family: inherit; cursor: pointer; }
     padding: 64px 24px;
     background: var(--color-bg-cream);
     border-radius: var(--radius-lg);
+    /* 크림 배경 위 텍스트라 body 텍스트색이 뒤집혀도(예: 상세 페이지 다크 배경) 항상
+       이 컨테이너 기준으로만 색이 상속되도록 명시해둔다. */
+    color: var(--color-text);
 }
 .empty-state__icon { font-size: 34px; margin-bottom: 14px; }
 .empty-state h3 { font-size: 19px; font-weight: 700; margin-bottom: 8px; }
@@ -551,6 +578,61 @@ button { font-family: inherit; cursor: pointer; }
 .card h3 { font-size: 19px; font-weight: 700; margin-bottom: 10px; }
 .card p { color: var(--color-text-muted); font-size: 14.5px; margin-bottom: 18px; }
 .card__tags { display: flex; flex-wrap: wrap; gap: 8px; }
+
+/* 자료실 카드 (2026-08-14 추가) — 파일이 있으면 다운로드 목록, 없으면 badge--soon */
+.resource-card { display: flex; flex-direction: column; }
+.resource-card__files { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 8px; }
+.resource-card__files a {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 10px 14px;
+    border-radius: 10px;
+    background: #fff;
+    color: var(--color-text);
+    font-size: 14px;
+    font-weight: 600;
+    text-decoration: none;
+    border: 1px solid var(--color-border);
+    transition: border-color .15s ease;
+}
+.resource-card__files a:hover { border-color: var(--color-accent-warm); }
+
+/* 답변 게시판 (2026-08-14 추가) — /answers/, /admin/ 페이지에서 공용으로 쓰는 목록/상세 스타일.
+   다크 배경(body.page-detail) 위에 놓이므로 카드는 항상 밝은 배경 + 자체 color를 갖는다. */
+.answer-list { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 10px; }
+.answer-list__row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+    padding: 18px 22px;
+    border-radius: var(--radius-lg);
+    background: #fff;
+    color: var(--color-text);
+    text-decoration: none;
+    border: 1px solid var(--color-border);
+    transition: border-color .15s ease, transform .15s ease;
+}
+.answer-list__row:hover { border-color: var(--color-accent-warm); transform: translateY(-1px); }
+.answer-list__title { font-weight: 700; font-size: 15px; display: flex; align-items: center; gap: 8px; }
+.answer-list__lock { font-size: 13px; }
+.answer-list__meta { display: flex; align-items: center; gap: 14px; font-size: 13px; color: var(--color-text-muted); }
+.answer-list__date { white-space: nowrap; }
+.answer-list__cta { font-weight: 700; color: var(--color-text); }
+.badge--pending { background: rgba(107,107,112,.14); color: var(--color-text-muted); }
+.badge--answered { background: rgba(46,139,87,.16); color: #1f7a48; }
+.answer-detail__label {
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: .05em;
+    text-transform: uppercase;
+    color: var(--color-text-muted);
+    margin-bottom: 4px;
+}
+.field__hint { font-size: 12px; color: var(--color-text-soft); margin-top: 4px; }
 
 /* ---------- 프로세스 (다크 패널, 4단계) ---------- */
 .process { padding: 48px; }
@@ -589,7 +671,7 @@ button { font-family: inherit; cursor: pointer; }
 }
 .automation__feature h4 { font-size: 15.5px; font-weight: 700; margin-bottom: 6px; }
 .automation__feature p { font-size: 14px; color: var(--color-text-muted); }
-.automation__apps { background: var(--color-bg-cream); border-radius: var(--radius-lg); padding: 28px; margin-top: 8px; }
+.automation__apps { background: var(--color-bg-cream); border-radius: var(--radius-lg); padding: 28px; margin-top: 8px; color: var(--color-text); }
 .automation__apps p.heading { font-weight: 700; margin-bottom: 14px; font-size: 14px; }
 .automation__apps ul { display: flex; flex-wrap: wrap; gap: 8px; }
 .automation__cta {
@@ -666,7 +748,7 @@ button { font-family: inherit; cursor: pointer; }
 .gd-hero { text-align: left; }
 .gd-projects { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 22px; }
 .gd-steps { display: grid; grid-template-columns: repeat(4, 1fr); gap: 22px; }
-.gd-step { background: var(--color-bg-cream); border-radius: var(--radius-lg); padding: 26px; }
+.gd-step { background: var(--color-bg-cream); border-radius: var(--radius-lg); padding: 26px; color: var(--color-text); }
 .gd-step .step-num { font-size: 12px; font-weight: 700; color: var(--color-accent-warm); letter-spacing: .08em; margin-bottom: 12px; }
 .gd-step h4 { font-size: 16px; font-weight: 700; margin-bottom: 8px; }
 .gd-step p { font-size: 13.5px; color: var(--color-text-muted); }
@@ -688,7 +770,8 @@ button { font-family: inherit; cursor: pointer; }
     .footer__inner { grid-template-columns: 1fr; }
     .hero { min-height: 80vh; }
     .panel--brand-bg { padding: 40px 0 48px; }
-    body.page-home {
+    body.page-home,
+    body.page-detail {
         background-size: cover, 380px auto, 56px 56px;
         background-position: center, right -60px bottom -10px, left top;
     }

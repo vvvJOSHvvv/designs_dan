@@ -492,7 +492,7 @@ DB는 필요 없어서 바로 뜬다.
 | 건축/디자인/솔루션 하위 카드 → 상세 페이지 9개 | 완료 |
 | 예전 `/graphic-design/` 주소 → `/design/graphic/` 301 리다이렉트 | 완료 |
 | 한/영 전환 (실제로 동작) | 완료 — `?lang=`, 쿠키 유지, 탭 상태 유지, 데스크톱/모바일 토글 둘 다 |
-| 문의 폼 | 완료했지만 **실제 메일 발송 연동 없음** — 제출하면 알림창만 뜨고 끝 |
+| 문의 폼 | **2026-08-14부터 실제로 DB에 저장됨** (답변 게시판 섹션 참고) — 다만 새 문의가 와도 관리자에게 이메일 알림은 아직 안 감(관리자가 `/admin/`에 직접 들어가서 확인해야 함) |
 | 실제 사진/이미지 | **전부 없음.** About 섹션은 베이지색 placeholder 박스 |
 | 어플(`/solutions/apps/`) | 자리는 완성, **앱은 아직 0개** — "새 앱 추가하는 법" 참고 |
 
@@ -500,11 +500,291 @@ DB는 필요 없어서 바로 뜬다.
 
 1. **실제 사진 준비.** About 섹션 팀/사무실 사진, 각 상세 페이지 아이콘을 실제 사진/
    일러스트로 교체하고 싶으면 `assets/images/`에 넣고 해당 `<div>`를 `<img>`로 바꾸면 된다.
-2. **문의 폼 실제 발송.** 지금은 `assets/js/app.js`에서 `alert()`만 띄우는 데모 상태.
-   PHP `mail()` 또는 외부 이메일 서비스(Resend/SendGrid 등) 연동 필요.
+2. **문의 폼 저장은 완료.** 2026-08-14에 답변 게시판을 만들면서 실제 DB 저장으로
+   바뀌었다 (아래 "답변 게시판" 섹션 참고). 남은 건 "새 문의 왔을 때 관리자에게
+   이메일 알림 보내기"뿐 — PHP `mail()` 또는 외부 이메일 서비스(Resend/SendGrid
+   등) 연동이 필요하고, 아직 안 되어 있음. 지금은 관리자가 `/admin/`에 직접
+   들어가서 확인해야 새 문의를 알 수 있다.
 3. **첫 앱(그룹통화) 추가.** Render 배포가 끝나면 위 "새 앱 추가하는 법" 그대로
    `solutions/apps/index.php`의 `$apps[]`에 한 줄 추가.
 4. **DNS/도메인 실제 배포는 완전히 별도 작업.** 지금까지는 전부 로컬 코드 작업만
    했고, `designs-dan.com` 도메인을 실제로 이 새 코드에 연결하는 작업(도메인
    등록처 확인, 호스팅 선택, DNS 레코드 수정, `app이름.designs-dan.com` 서브도메인
    설정)은 아직 시작 안 함.
+
+## 호스팅 & 배포 (2026-08-14 추가)
+
+`designs-dan.com`은 Render(Docker 웹 서비스)에 배포되어 있다.
+
+- **GitHub 저장소**: `github.com/vvvJOSHvvv/designs_dan` (public). 이 세션은 GitHub에
+  직접 push할 권한이 없어서, 코드를 수정할 때마다 바뀐 파일을 사용자가 GitHub
+  웹 화면에서 드래그 앤 드롭으로 다시 업로드해야 한다.
+- **Render 웹 서비스**: `designs_dan` (Docker, Singapore, Free 플랜). GitHub `main`
+  브랜치에 새 커밋이 올라오면 **자동 배포**된다 (`autoDeploy: yes`). 기본 주소는
+  `https://designs-dan.onrender.com`.
+- **Dockerfile**: `php:8.2-apache` 베이스, `DocumentRoot`를 프로젝트 루트로 지정.
+  외부 패키지 의존성 없음(순수 PHP)이라 그대로 빌드된다.
+- **커스텀 도메인**: `designs-dan.com` / `www.designs-dan.com`을 Render Custom
+  Domain으로 연결. DNS는 Readdy 쪽 DNS 관리 화면(`readdy.ai` 로그인 후 도메인
+  설정)에서 편집:
+  - `designs-dan.com` (A) → `216.24.57.1`
+  - `www.designs-dan.com` (CNAME) → `designs-dan.onrender.com`
+  - 나머지 레코드(send/_domainkey/_acme-challenge 등)는 Readdy 이메일·인증서용이라
+    건드리지 않음.
+
+**배포 순서 요약**: (1) 이 세션에서 코드 수정 → (2) 사용자가 바뀐 파일을 GitHub에
+재업로드 → (3) Render가 자동으로 감지해서 재배포 (사용자가 따로 할 것 없음).
+
+### ⚠️ 트러블슈팅 — "DNS는 맞는데 계속 예전 Readdy 사이트가 나옴"
+
+2026-08-14에 실제로 겪은 문제라 기록해둔다. Render Custom Domain에 DNS 레코드를
+전부 정확히 맞춰놓고(A/CNAME 둘 다 Render 쪽 값으로), Render 대시보드에서도
+`Verified` + `Certificate Issued`로 초록불이 다 떴는데도, 몇 시간 동안 계속
+`designs-dan.com`(www 없는 루트)에서만 예전 Readdy 사이트가 나오는 현상이 있었다.
+(`www.designs-dan.com`은 바로 정상 작동함 — 이 차이가 결정적 단서였다.)
+
+**원인**: DNS 레코드 문제가 아니라, Readdy 계정 자체의 "**커스텀 도메인**" 화면에서
+`designs-dan.com`이 여전히 Readdy의 예전 프로젝트(예: "라이브 버전 179")에
+"**기본 도메인**"으로 게시(publish)된 상태로 남아있었기 때문이었다. 이건 DNS
+레코드 편집 화면(Readdy → 도메인 설정 → DNS 설정)과는 **완전히 별개의 설정**이라,
+DNS를 아무리 정확하게 고쳐도 Readdy 쪽에서 그 도메인을 "내가 게시한 사이트"로
+붙잡고 있는 한 안 풀린다.
+
+**해결**: Readdy 로그인 → 프로젝트 → "커스텀 도메인" 화면 → `designs-dan.com` 옆
+점 3개(⋮) 메뉴 → **"게시 취소"** 클릭 (예전 Readdy 사이트 자체를 내리는 것 — 우리는
+이미 Render로 완전히 이전했으니 안전함). 이후 Readdy 쪽 캐시가 풀리기까지 다시
+몇 시간 정도 더 걸렸다 (거의 정확히 게시 취소 후 2시간 반쯤 지나서 확인됨).
+중간에 일시적으로 예전 사이트 / 404 / 새 사이트가 뒤섞여서 보이는 등 불안정한
+상태를 거쳤지만, 결국 전 세계 캐시가 다 풀리면서 정상화됐다.
+
+**교훈**: 만약 나중에 또 이런 "DNS는 맞는데 반영이 안 됨" 증상이 생기면, DNS
+레코드보다 먼저 Readdy(또는 원래 쓰던 사이트 빌더) 계정에 그 도메인을 "게시"
+상태로 붙잡고 있는 설정이 남아있는지부터 확인할 것.
+
+## 자료실 탭 (2026-08-14 추가)
+
+> **배포 상태 (2026-08-14 기준): 로컬/Mac 폴더에만 반영, GitHub·라이브 사이트에는
+> 아직 안 올라감.** 자료실 탭 + 탭 순서(자료실↔문의하기) 변경 둘 다 사용자가
+> "추가 작업을 하고 나중에 같이" GitHub에 올리기로 함. 그래서 지금 `designs-dan.com`
+> 라이브 사이트 nav에는 자료실 탭이 안 보이는 게 정상. 다음에 GitHub 업로드할 때
+> 아래 "아직 GitHub에 안 올라간 변경사항 모음" 섹션의 전체 파일 목록을 같이 올려야 함
+> (자료실 탭 하나만이 아니라, 이후에 이어서 작업한 문의하기 탭 제거 + 상세페이지
+> 다크 배경 통일까지 전부 한 묶음으로 밀려있는 상태).
+
+홈 탭에 "문의하기" 다음으로 **자료실**(`#resources`) 탭을 추가했다. 도면·어플·명함·
+인쇄 이미지 등 고객에게 전달해야 할 작업 파일을 카테고리별로 모아 다운로드할 수 있게
+만든 자리다. 지금은 카테고리 틀만 있고 실제 파일은 아직 없음(전부 "준비중" 배지).
+
+- **카테고리 데이터**: `includes/resources.php`의 `$RESOURCE_CATEGORIES` 배열.
+  `solutions/apps/index.php`의 `$apps` 배열과 똑같은 패턴 — 항목에 `'files' => []`가
+  비어있으면 "준비중" 배지, 하나라도 있으면 자동으로 다운로드 링크 목록이 뜬다.
+- **파일 추가하는 법**:
+  1. `assets/resources/` 폴더(없으면 새로 생성)에 실제 파일을 넣는다.
+  2. `includes/resources.php`에서 해당 카테고리의 `'files'` 배열에 한 줄 추가:
+     `['name_en' => 'Floor Plan v2', 'name_ko' => '평면도 v2', 'file' => 'floor-plan-v2.pdf']`
+- **새 카테고리 추가**: `$RESOURCE_CATEGORIES`에 항목을 하나 더 추가하면 끝
+  (nav 탭 자체는 `includes/services.php`의 `$NAV_SERVICES`에 등록되어 있고, 이건
+  자료실 안의 하위 카테고리 목록만 다루는 별도 배열이다).
+- 관련 파일: `includes/resources.php`(신규), `index.php`(자료실 패널 섹션),
+  `includes/services.php`(nav에 `resources` 탭 추가), `includes/lang.php`
+  (`nav.resources`, `tab.resources.*`), `assets/css/app.css`(`.resource-card__files`).
+
+## 문의하기 탭 제거 + 이메일 문의 → 문의하기 버튼 (2026-08-14 추가)
+
+상단 nav 탭에서 "문의하기"를 뺐다 (오른쪽에 이미 있는 "문의하기" 버튼과 중복돼서).
+대신 그 오른쪽 CTA 버튼 이름을 기존 "이메일 문의"에서 "문의하기"로 바꿨다 —
+`nav.email_inquiry` 키는 삭제하고 기존 `nav.contact` 키를 재사용.
+
+실제 `#contact` 패널(`index.php`)과 `findNavTab('contact')` 호출은 그대로 남아있어서,
+`data-tab="contact"` 링크(각 상세페이지의 "상담 문의하기" 버튼 등)는 계속 정상
+동작한다 — 탭 전환 JS(`app.js`)가 `$NAV_SERVICES` 배열이 아니라 실제
+`.panel[data-panel]` 요소를 기준으로 동작하기 때문. 자세한 설명은
+`includes/services.php` 상단 주석 참고.
+
+- 관련 파일: `includes/services.php`(`$NAV_SERVICES`에서 `contact` 항목 삭제),
+  `includes/header.php`(CTA 버튼을 `nav.contact` 키로 변경), `includes/lang.php`
+  (`nav.email_inquiry` 키 삭제).
+
+## 상세페이지(9개) 다크 배경 통일 (2026-08-14 추가)
+
+카드를 눌러 들어간 상세페이지(예: 건축>설계, 디자인>그래픽&상업)의 배경이 흰색이라
+홈 화면의 어두운 블루프린트 톤과 안 어울린다는 피드백 → 사용자가 "전체 다크로
+통일" 선택. 홈 탭과 똑같은 다크 블루프린트 그라데이션 배경을 9개 상세페이지 전부에
+적용했다 (`graphic-design/index.php`는 리다이렉트 전용이라 대상 아님).
+
+- **동작 원리**: 각 상세페이지 파일에서 `header.php`를 불러오기 직전에
+  `$isDetailPage = true;`를 설정 → `header.php`가 `<body class="page-detail">`를
+  붙인다 (`page-home`과 마찬가지 패턴, 서로 배타적). `app.css`에서
+  `body.page-home, body.page-detail { background: ... }`로 같은 블루프린트
+  배경을 공유하고, `body.page-detail`에 `color: var(--color-text-inverse)`를
+  줘서 카드 등 자체 배경이 없는 텍스트가 자동으로 밝은색이 되게 했다.
+- **밝은 배경 컴포넌트는 그대로 유지**: `.card`/`.card--cream`(흰색/크림 카드가
+  번갈아 나오는 기존 리듬), `.section--cream`(디자인>그래픽 페이지의 "제작
+  프로세스" 박스), `.gd-step`/`.automation__apps`/`.empty-state` — 이 컴포넌트들은
+  전부 자체 `color: var(--color-text)`를 컨테이너에 직접 지정해뒀기 때문에, body
+  텍스트색이 뒤집혀도 안쪽 제목/본문 글자색이 깨지지 않는다 (기존에 `.card`가 쓰던
+  것과 같은 안전 패턴을 확장 적용).
+- **골드 vs 앰버 eyebrow**: 어두운 배경 위 eyebrow(작은 라벨 텍스트)는
+  `var(--color-accent)`(밝은 골드), 크림 박스 위 eyebrow는 기존
+  `var(--color-accent-warm)`(앰버)를 유지 — `body.page-detail .section:not
+  (.section--cream) .eyebrow` 처럼 `.section--cream`을 명시적으로 제외해서 두
+  버전이 서로 안 섞이게 했다.
+- **인라인 스타일 2곳 직접 수정**: `design/graphic/index.php`의 프로젝트 소개
+  문단(`color:var(--color-text-muted)` → `var(--color-text-inverse-muted)`),
+  `solutions/automation/index.php`의 첫 기능 항목 상단 테두리
+  (`border-top:1px solid var(--color-border)` → `var(--color-border-dark)`) —
+  인라인 스타일은 CSS 클래스 규칙으로 덮어쓸 수 없어서 값 자체를 바꿔야 했다.
+- **이미 다크였던 컴포넌트는 그대로**: `.section--dark`(건축>시공, 솔루션>컨설팅의
+  프로세스 박스)는 원래부터 자체 다크 배경/글자색을 갖고 있어서 손댈 필요 없었음.
+- 새 상세페이지를 추가할 때: 다른 8개처럼 `header.php` require 직전에
+  `$isDetailPage = true;`만 넣으면 자동으로 같은 다크 배경이 적용된다.
+- 관련 파일: `includes/header.php`(`$isDetailPage` 변수 + body 클래스),
+  `assets/css/app.css`(`body.page-detail` 관련 규칙 전체),
+  9개 상세페이지 전부(각각 `$isDetailPage = true;` 한 줄 추가),
+  `design/graphic/index.php` + `solutions/automation/index.php`(인라인 스타일
+  값 수정, 위 항목 참고).
+
+## 답변 게시판 + 관리자 페이지 (2026-08-14 추가)
+
+> **이 기능은 GitHub에 올리는 것만으로는 라이브 사이트에서 동작하지 않는다.**
+> 아래 "운영 배포 전 꼭 해야 할 일"을 먼저 끝내야 한다 — 안 그러면 문의 폼을
+> 제출하는 순간 사이트가 에러를 낸다 (DB 연결 실패). 자세한 내용은 이 섹션 끝의
+> 안내 참고.
+
+홈 화면의 "문의하기" 폼이 이제 진짜로 저장되고, 보낸 사람은 자기 글을 게시판에서
+다시 볼 수 있다. 요청한 대로 "비밀번호로 잠그는 게시판"(네이버 카페 비밀글과 같은
+패턴) 방식으로 만들었고, 관리자는 별도 로그인 후 모든 문의를 보고 답변/견적을 달
+수 있다.
+
+**"답변" nav 위치 (2026-08-14, 배치 확정)**: 처음엔 왼쪽 탭 줄(자료실 옆)에 뒀다가,
+"자료실 옆 vs 문의하기 옆" 중 어디가 나을지 논의 끝에 **문의하기 옆**으로 옮겼다 —
+답변은 자료실(완성 파일 다운로드)보다 문의하기(내가 쓴 글에 대한 응답 확인)와 성격이
+같은 짝이라는 판단. 그래서 지금은 왼쪽 탭 줄(`$NAV_SERVICES` + 답변)이 아니라,
+오른쪽 `.nav__actions` 안에서 EN 토글과 문의하기 버튼 사이에 있다
+(`includes/header.php`의 `.nav__answers-link`). 모바일 메뉴에는 원래 문의하기로
+갈 방법이 아예 없었는데(=`.nav__actions .btn`이 좁은 화면에서 그냥 숨겨지기만 하고
+대체 링크가 없었음), 이번에 답변 바로 아래에 문의하기 버튼을 새로 추가해서 그
+빈틈도 같이 메웠다. **CSS 주의**: 모바일 브레이크포인트(`@media max-width:960px`)에서
+`.nav__menu, .nav__actions .btn, .nav__lang`을 숨기는 규칙에 `.nav__answers-link`를
+반드시 같이 넣어야 한다 — 안 그러면 모바일에서 버거 메뉴 옆에 "답변"이 중복으로
+남는다 (실제로 한 번 이렇게 빠뜨렸다가 스크린샷 확인 중 발견해서 고침).
+
+### 사용자 쪽 흐름
+
+1. 홈 `#contact`에서 이름/이메일/전화/문의유형/메시지 + **비밀번호(선택)**를 입력해 제출.
+   비밀번호를 넣으면 비공개 글이 되고, 비워두면 공개 글이 된다.
+2. 제출하면 자동으로 `/answers/view.php?id=번호`로 이동 — 이게 "내 글" 주소이니
+   나중에 답변 확인하려면 이 주소나 비밀번호를 기억해 둬야 한다.
+3. 상단 nav의 **답변** 탭(`/answers/`)에 모든 문의가 목록으로 뜬다. 이름은
+   `홍**`처럼 일부만 보이게 가리고, 이메일/전화번호는 목록·상세 어디에도 공개
+   노출 안 함(관리자만 볼 수 있음). 비공개 글은 🔒 표시.
+4. 비공개 글을 누르면 비밀번호를 입력해야 내용이 보인다 (세션에 저장되어, 같은
+   브라우저에서는 다시 안 물어봄).
+5. 관리자가 답변을 달면 상태가 "답변 완료"로 바뀌고, 그 페이지에 답변 내용 +
+   (있으면) 견적 내용이 크림색 박스로 따로 표시된다.
+
+### 관리자 쪽 흐름
+
+- 풋터의 **관리자 로그인**(예전엔 죽은 링크였음) → `/admin/login.php` → 아이디+
+  비밀번호로 로그인 → `/admin/index.php`에서 전체 문의 목록(비공개 글도 비밀번호
+  없이 다 보임) → 글 클릭 → `/admin/view.php`에서 연락처(이메일/전화)까지 전부
+  보고, 답변/견적 작성 폼으로 답변 등록.
+- 로그인 안 하고 `/admin/*.php`에 들어가면 자동으로 로그인 페이지로 리다이렉트.
+
+### 첫 관리자 계정 만들기
+
+관리자 회원가입 화면은 따로 없다 (보안상 아무나 관리자를 못 만들게). 대신
+**`/admin/setup.php`**가 "관리자 계정이 하나도 없을 때만" 동작하는 1회용
+부트스트랩 페이지다. 배포 후 제일 먼저:
+
+1. `https://designs-dan.com/admin/setup.php` 접속
+2. 원하는 아이디 + 비밀번호(8자 이상) 입력 후 계정 만들기
+3. 그 다음부터 이 페이지는 "이미 관리자 계정이 있어서 사용할 수 없습니다"만
+   보여준다 (재사용 불가 — 계정을 더 추가하려면 지금은 DB에 직접 넣어야 함,
+   나중에 관리자 화면에서 계정 추가 기능을 만들 수도 있음).
+
+### 데이터 구조 (DB)
+
+- `includes/db.php`의 `db()` 함수가 PDO 연결을 돌려준다. 딱 한 곳에서만
+  연결하면 되므로, DB를 쓰는 페이지는 전부 `require includes/db.php` +
+  `require includes/answers-data.php`를 불러온다.
+- **운영(Render)**: 환경변수 `DATABASE_URL`이 있으면 그걸 Postgres 연결
+  문자열로 파싱해서 쓴다 (`postgres://user:pass@host:5432/dbname` 형태).
+- **로컬 개발**: `DATABASE_URL`이 없으면 `data/app.db`(SQLite 파일)를 자동
+  생성해서 쓴다. `data/`는 `.gitignore`에 등록되어 있어 GitHub에는 절대 안
+  올라간다 (문의자 개인정보가 들어있으므로 안전).
+- 테이블 3개, 최초 연결 시 자동 생성(`db_init_schema()`):
+  `admin_users`(id, username, password_hash), `inquiries`(id, name, email,
+  phone, inquiry_type, message, password_hash, status, created_at),
+  `inquiry_replies`(id, inquiry_id, admin_username, reply_message,
+  quote_text, created_at).
+- 비밀번호(관리자 로그인 비밀번호 + 문의 비공개 비밀번호)는 전부
+  `password_hash()`로 해시해서 저장, 평문 저장 없음.
+
+### 관련 파일
+
+- `includes/db.php`(신규, DB 연결), `includes/answers-data.php`(신규, DB 조회/저장
+  함수 모음), `includes/auth.php`(신규, 관리자 세션 헬퍼), `includes/mask.php`(신규,
+  목록에서 이름 가리기)
+- `actions/inquiry-submit.php`(신규, 홈 문의 폼 제출 처리)
+- `answers/index.php`, `answers/view.php`(신규, 공개 게시판)
+- `admin/login.php`, `admin/logout.php`, `admin/index.php`, `admin/view.php`,
+  `admin/setup.php`(신규, 관리자 전용)
+- `index.php`(문의 폼에 비밀번호 필드 추가 + 실제 POST로 제출되도록 변경),
+  `assets/js/app.js`(가짜 `alert()` 제출 방지 코드 제거),
+  `includes/header.php`/`includes/footer.php`(nav·footer에 "답변" 링크 추가,
+  footer "관리자 로그인" 링크를 실제 주소로 연결), `includes/lang.php`(답변
+  게시판/관리자 관련 번역 키 대량 추가), `assets/css/app.css`(`.answer-list`,
+  `.badge--pending`/`--answered`, `.answer-detail__label` 등), `.gitignore`(신규,
+  `data/` 제외 목록)
+
+### 운영 배포 전 꼭 해야 할 일 (아직 안 함)
+
+1. **외부 DB 준비.** Render 무료 플랜은 파일이 배포/재시작마다 초기화되기 때문에,
+   SQLite처럼 컨테이너 안에 파일로 저장하는 방식은 운영에서 못 쓴다. 무료
+   Postgres(예: Supabase)에 가입하고 프로젝트를 만들면 연결 문자열(`postgres://...`)이
+   나온다.
+2. **Render에 `DATABASE_URL` 환경변수 등록.** 이 연결 문자열은 비밀번호가 포함되어
+   있어서 코드나 GitHub(공개 저장소)에 절대 넣으면 안 된다 — **Josh님이 Render
+   대시보드(Environment 탭)에 직접 입력**하는 걸 추천. (Claude가 이 값을 대신
+   입력하는 건 보안상 하지 않기로 함.)
+3. 배포되면 위 "첫 관리자 계정 만들기" 순서대로 `/admin/setup.php`에서 계정 생성.
+4. (선택, 나중에) 새 문의 왔을 때 관리자에게 이메일로 알림 — 아직 안 만들었음.
+
+## 아직 GitHub에 안 올라간 변경사항 모음 (2026-08-14 기준)
+
+로컬/Mac 폴더에는 반영됐지만 GitHub·라이브 사이트(`designs-dan.com`)에는 아직 안
+올라간 변경사항들. 사용자가 "추가 작업을 하고 나중에 같이" 업로드하기로 해서 보류
+중 — 다음에 GitHub에 올릴 때 아래 파일들을 전부 같이 올려야 한다 (부분만 올리면
+예를 들어 `.resource-card` 스타일은 있는데 `resources.php` 데이터가 없는 식으로
+어긋날 수 있음).
+
+- **자료실 탭 신규 추가**: `includes/resources.php`(신규), `config.php`
+  (`resources.php` require 추가), `index.php`, `includes/services.php`,
+  `includes/lang.php`, `assets/css/app.css`
+- **문의하기 탭 제거 + 버튼 이름 변경**: `includes/services.php`,
+  `includes/header.php`, `includes/lang.php`
+- **상세페이지 9개 다크 배경 통일**: `includes/header.php`, `assets/css/app.css`,
+  `architecture/aerial-survey/index.php`, `architecture/construction/index.php`,
+  `architecture/design/index.php`, `design/graphic/index.php`,
+  `design/video/index.php`, `solutions/apps/index.php`,
+  `solutions/automation/index.php`, `solutions/consulting/index.php`,
+  `solutions/website/index.php`
+- **답변 게시판 + 관리자 페이지**: `includes/db.php`(신규),
+  `includes/answers-data.php`(신규), `includes/auth.php`(신규),
+  `includes/mask.php`(신규), `actions/inquiry-submit.php`(신규),
+  `answers/index.php`(신규), `answers/view.php`(신규), `admin/login.php`(신규),
+  `admin/logout.php`(신규), `admin/index.php`(신규), `admin/view.php`(신규),
+  `admin/setup.php`(신규), `.gitignore`(신규), `index.php`, `assets/js/app.js`,
+  `includes/header.php`, `includes/footer.php`, `includes/lang.php`,
+  `assets/css/app.css` — **⚠️ 이건 GitHub에 올리는 것 외에 DB 연결(Render
+  `DATABASE_URL` 환경변수)까지 끝나야 실제로 동작함. 위 "답변 게시판" 섹션의
+  "운영 배포 전 꼭 해야 할 일" 참고.**
+
+정리하면: `includes/header.php`, `includes/services.php`, `includes/lang.php`,
+`assets/css/app.css`, `index.php`, `config.php`, `includes/resources.php`(신규),
+`assets/js/app.js`, `.gitignore`(신규), 9개 상세페이지 전부, 그리고 답변
+게시판/관리자 관련 신규 파일 12개(`includes/db.php`, `includes/answers-data.php`,
+`includes/auth.php`, `includes/mask.php`, `actions/inquiry-submit.php`,
+`answers/index.php`, `answers/view.php`, `admin/login.php`, `admin/logout.php`,
+`admin/index.php`, `admin/view.php`, `admin/setup.php`)가 GitHub 업로드 대상이다.

@@ -35,3 +35,6 @@ require_once __DIR__ . '/includes/lang.php';
 
 // 서비스 카테고리 & 네비게이션 데이터 (상단 드롭다운 메뉴가 여기서 나옵니다)
 require_once __DIR__ . '/includes/services.php';
+
+// 자료실(자료 다운로드) 카테고리 데이터
+require_once __DIR__ . '/includes/resources.php';

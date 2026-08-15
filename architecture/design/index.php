@@ -3,6 +3,7 @@ require __DIR__ . '/../../config.php';
 $pageTitle = t('detail.architecture.design.title') . ' | DESIGN DAN';
 $pageDescription = t('detail.architecture.design.intro');
 $activeNav = 'architecture';
+$isDetailPage = true;
 require __DIR__ . '/../../includes/header.php';
 
 $detailParentSlug = 'architecture';
