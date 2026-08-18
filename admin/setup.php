@@ -8,27 +8,49 @@
 require __DIR__ . '/../config.php';
 require __DIR__ . '/../includes/db.php';
 require __DIR__ . '/../includes/answers-data.php';
+require __DIR__ . '/../includes/session-boot.php';
+require __DIR__ . '/../includes/csrf.php';
+startAppSession();
 
-$alreadyHasAdmin = hasAnyAdminUser();
+/**
+ * 레이스 컨디션 방지 (2026-08-16 추가): 관리자 계정이 하나도 없는 짧은 시간 동안,
+ * 이 URL을 아는 사람이면 누구나 먼저 접속해서 자신을 관리자로 등록할 수 있었다.
+ * Render 환경변수에 ADMIN_SETUP_TOKEN을 넣어두면, 그 값을 ?token= 으로 정확히
+ * 붙여야만 이 페이지가 동작한다. env var를 안 넣으면(로컬 개발 등) 예전처럼
+ * 토큰 없이 그냥 동작한다 — 하위 호환.
+ */
+$requiredToken = getenv('ADMIN_SETUP_TOKEN') ?: '';
+$providedToken = $_GET['token'] ?? ($_POST['token'] ?? '');
+$tokenOk = $requiredToken === '' || hash_equals($requiredToken, (string) $providedToken);
+
+require __DIR__ . '/../includes/error-page.php';
+
 $setupError = '';
 $setupDone = false;
 
-if (!$alreadyHasAdmin && $_SERVER['REQUEST_METHOD'] === 'POST') {
-    $username = trim($_POST['username'] ?? '');
-    $password = (string) ($_POST['password'] ?? '');
-    if ($username === '' || $password === '') {
-        $setupError = 'required';
-    } elseif (mb_strlen($password) < 8) {
-        $setupError = 'too_short';
-    } else {
-        createAdminUser($username, $password);
-        $setupDone = true;
-        $alreadyHasAdmin = true;
+try {
+    $alreadyHasAdmin = hasAnyAdminUser();
+
+    if ($tokenOk && !$alreadyHasAdmin && $_SERVER['REQUEST_METHOD'] === 'POST' && csrfCheck($_POST['csrf_token'] ?? '')) {
+        $username = trim($_POST['username'] ?? '');
+        $password = (string) ($_POST['password'] ?? '');
+        if ($username === '' || $password === '') {
+            $setupError = 'required';
+        } elseif (mb_strlen($password) < 8) {
+            $setupError = 'too_short';
+        } else {
+            createAdminUser($username, $password);
+            $setupDone = true;
+            $alreadyHasAdmin = true;
+        }
     }
+} catch (Throwable $e) {
+    renderDbErrorPage($e);
 }
 
 $pageTitle = t('admin.setup.title') . ' | DESIGN DAN';
 $isDetailPage = true;
+$isNoIndex = true;   // 관리자 화면은 검색엔진에 노출 안 함
 require __DIR__ . '/../includes/header.php';
 ?>
 <main>
@@ -42,15 +64,21 @@ require __DIR__ . '/../includes/header.php';
 <section class="section" style="padding-top:16px;">
     <div class="container" style="max-width:420px;">
 
-        <?php if ($setupDone): ?>
+        <?php if (!$tokenOk): ?>
+            <div class="card"><p><?= te('admin.setup.token_error') ?></p></div>
+        <?php elseif ($setupDone): ?>
             <div class="card card--cream">
-                <p style="margin-bottom:14px;">✅ <?= htmlspecialchars($_POST['username'] ?? '') ?></p>
+                <p style="margin-bottom:14px;"><?= icon('circle_check') ?> <?= htmlspecialchars($_POST['username'] ?? '') ?></p>
                 <a class="btn btn--primary" href="<?= url('/admin/login.php') ?>"><?= te('admin.login.title') ?> →</a>
             </div>
         <?php elseif ($alreadyHasAdmin): ?>
             <div class="card"><p><?= te('admin.setup.done') ?></p></div>
         <?php else: ?>
             <form method="post" class="card form-grid">
+                <?= csrfField() ?>
+                <?php if ($requiredToken !== ''): ?>
+                    <input type="hidden" name="token" value="<?= htmlspecialchars($providedToken) ?>">
+                <?php endif; ?>
                 <div class="field field--full">
                     <label for="username"><?= te('admin.login.username') ?></label>
                     <input type="text" id="username" name="username" autofocus required>

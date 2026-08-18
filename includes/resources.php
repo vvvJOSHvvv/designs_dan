@@ -19,7 +19,7 @@
 
 $RESOURCE_CATEGORIES = [
     [
-        'icon'    => '📐',
+        'icon'    => 'ruler',
         'name_en' => 'Drawings',
         'name_ko' => '도면',
         'desc_en' => 'Floor plans, elevations, and construction drawings.',
@@ -27,7 +27,7 @@ $RESOURCE_CATEGORIES = [
         'files'   => [],
     ],
     [
-        'icon'    => '📱',
+        'icon'    => 'smartphone',
         'name_en' => 'Apps',
         'name_ko' => '어플',
         'desc_en' => 'Files and assets related to apps we built for you.',
@@ -35,7 +35,7 @@ $RESOURCE_CATEGORIES = [
         'files'   => [],
     ],
     [
-        'icon'    => '🪪',
+        'icon'    => 'id_card',
         'name_en' => 'Business Cards',
         'name_ko' => '명함',
         'desc_en' => 'Print-ready business card files.',
@@ -43,7 +43,7 @@ $RESOURCE_CATEGORIES = [
         'files'   => [],
     ],
     [
-        'icon'    => '🖼️',
+        'icon'    => 'image',
         'name_en' => 'Print Images',
         'name_ko' => '인쇄 이미지',
         'desc_en' => 'Flyers, posters, and other print-ready images.',
@@ -51,7 +51,7 @@ $RESOURCE_CATEGORIES = [
         'files'   => [],
     ],
     [
-        'icon'    => '📁',
+        'icon'    => 'folder',
         'name_en' => 'Other Files',
         'name_ko' => '기타 자료',
         'desc_en' => 'Any other materials prepared for you.',

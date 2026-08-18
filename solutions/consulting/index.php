@@ -4,12 +4,14 @@ $pageTitle = t('card.solutions.consulting.title') . ' | DESIGN DAN';
 $pageDescription = t('consult.intro');
 $activeNav = 'solutions';
 $isDetailPage = true;
+$isDetailFit = true;
+$ogImage = 'images/solutions-consulting.jpg'; // 카카오톡·SNS 공유 시 이 페이지 대표 이미지
 require __DIR__ . '/../../includes/header.php';
 
 $detailParentSlug = 'solutions';
 $detailTitleKey   = 'card.solutions.consulting.title';
 $detailIntroKey   = 'consult.intro';
-$detailIcon       = '💼';
+$detailIcon       = 'briefcase';
 ?>
 <main>
 <?php require __DIR__ . '/../../includes/detail-hero.php'; ?>
@@ -18,7 +20,7 @@ $detailIcon       = '💼';
     <div class="container">
         <div class="consulting-grid">
             <div class="card">
-                <div class="card__icon">📄</div>
+                <div class="card__icon"><?= icon('file_text') ?></div>
                 <h3><?= te('consult.c1.title') ?></h3>
                 <p><?= te('consult.c1.desc') ?></p>
                 <div class="card__tags">
@@ -26,7 +28,7 @@ $detailIcon       = '💼';
                 </div>
             </div>
             <div class="card">
-                <div class="card__icon">📣</div>
+                <div class="card__icon"><?= icon('megaphone') ?></div>
                 <h3><?= te('consult.c2.title') ?></h3>
                 <p><?= te('consult.c2.desc') ?></p>
                 <div class="card__tags">
@@ -34,7 +36,7 @@ $detailIcon       = '💼';
                 </div>
             </div>
             <div class="card">
-                <div class="card__icon">📦</div>
+                <div class="card__icon"><?= icon('package') ?></div>
                 <h3><?= te('consult.c3.title') ?></h3>
                 <p><?= te('consult.c3.desc') ?></p>
                 <div class="card__tags">
@@ -42,7 +44,7 @@ $detailIcon       = '💼';
                 </div>
             </div>
             <div class="card">
-                <div class="card__icon">📘</div>
+                <div class="card__icon"><?= icon('book_open') ?></div>
                 <h3><?= te('consult.c4.title') ?></h3>
                 <p><?= te('consult.c4.desc') ?></p>
                 <div class="card__tags">
@@ -50,7 +52,7 @@ $detailIcon       = '💼';
                 </div>
             </div>
             <div class="card">
-                <div class="card__icon">💰</div>
+                <div class="card__icon"><?= icon('coins') ?></div>
                 <h3><?= te('consult.c5.title') ?></h3>
                 <p><?= te('consult.c5.desc') ?></p>
                 <div class="card__tags">
@@ -58,7 +60,7 @@ $detailIcon       = '💼';
                 </div>
             </div>
             <div class="card">
-                <div class="card__icon">🧑‍💼</div>
+                <div class="card__icon"><?= icon('user_round') ?></div>
                 <h3><?= te('consult.c6.title') ?></h3>
                 <p><?= te('consult.c6.desc') ?></p>
                 <div class="card__tags">
@@ -77,22 +79,22 @@ $detailIcon       = '💼';
             </div>
             <div class="process-steps">
                 <div class="process-step">
-                    <div class="process-step__top"><span class="process-step__num">01</span><span class="process-step__icon">🔍</span></div>
+                    <div class="process-step__top"><span class="process-step__num">01</span><span class="process-step__icon"><?= icon('search') ?></span></div>
                     <h4><?= te('process2.step1.title') ?></h4>
                     <p><?= te('process2.step1.desc') ?></p>
                 </div>
                 <div class="process-step">
-                    <div class="process-step__top"><span class="process-step__num">02</span><span class="process-step__icon">🧩</span></div>
+                    <div class="process-step__top"><span class="process-step__num">02</span><span class="process-step__icon"><?= icon('puzzle') ?></span></div>
                     <h4><?= te('process2.step2.title') ?></h4>
                     <p><?= te('process2.step2.desc') ?></p>
                 </div>
                 <div class="process-step">
-                    <div class="process-step__top"><span class="process-step__num">03</span><span class="process-step__icon">🤝</span></div>
+                    <div class="process-step__top"><span class="process-step__num">03</span><span class="process-step__icon"><?= icon('handshake') ?></span></div>
                     <h4><?= te('process2.step3.title') ?></h4>
                     <p><?= te('process2.step3.desc') ?></p>
                 </div>
                 <div class="process-step">
-                    <div class="process-step__top"><span class="process-step__num">04</span><span class="process-step__icon">📈</span></div>
+                    <div class="process-step__top"><span class="process-step__num">04</span><span class="process-step__icon"><?= icon('trending_up') ?></span></div>
                     <h4><?= te('process2.step4.title') ?></h4>
                     <p><?= te('process2.step4.desc') ?></p>
                 </div>

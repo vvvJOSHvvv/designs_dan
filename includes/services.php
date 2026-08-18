@@ -32,27 +32,27 @@ $NAV_SERVICES = [
         'slug'      => 'architecture',
         'label_key' => 'nav.architecture',
         'items'     => [
-            ['slug' => 'design',         'label_key' => 'card.architecture.design.title',        'teaser_key' => 'card.architecture.design.teaser',        'icon' => '📐', 'href' => '/architecture/design/',        'photo' => 'images/architecture-design.jpg'],
-            ['slug' => 'aerial-survey',  'label_key' => 'card.architecture.aerial.title',         'teaser_key' => 'card.architecture.aerial.teaser',        'icon' => '🛰️', 'href' => '/architecture/aerial-survey/', 'photo' => 'images/architecture-survey.jpg'],
-            ['slug' => 'construction',   'label_key' => 'card.architecture.construction.title',   'teaser_key' => 'card.architecture.construction.teaser',  'icon' => '🏗️', 'href' => '/architecture/construction/',  'photo' => 'images/architecture-construction.jpg'],
+            ['slug' => 'design',         'label_key' => 'card.architecture.design.title',        'teaser_key' => 'card.architecture.design.teaser',        'icon' => 'ruler',    'href' => '/architecture/design/',        'photo' => 'images/architecture-design.jpg'],
+            ['slug' => 'aerial-survey',  'label_key' => 'card.architecture.aerial.title',         'teaser_key' => 'card.architecture.aerial.teaser',        'icon' => 'satellite', 'href' => '/architecture/aerial-survey/', 'photo' => 'images/architecture-survey.jpg'],
+            ['slug' => 'construction',   'label_key' => 'card.architecture.construction.title',   'teaser_key' => 'card.architecture.construction.teaser',  'icon' => 'hard_hat', 'href' => '/architecture/construction/',  'photo' => 'images/architecture-construction.jpg'],
         ],
     ],
     [
         'slug'      => 'design',
         'label_key' => 'nav.design',
         'items'     => [
-            ['slug' => 'graphic', 'label_key' => 'card.design.graphic.title', 'teaser_key' => 'card.design.graphic.teaser', 'icon' => '🎨', 'href' => '/design/graphic/', 'photo' => 'images/design-graphic-card.jpg'],
-            ['slug' => 'video',   'label_key' => 'card.design.video.title',   'teaser_key' => 'card.design.video.teaser',   'icon' => '🎬', 'href' => '/design/video/',   'photo' => 'images/design-video-card.jpg'],
+            ['slug' => 'graphic', 'label_key' => 'card.design.graphic.title', 'teaser_key' => 'card.design.graphic.teaser', 'icon' => 'palette',      'href' => '/design/graphic/', 'photo' => 'images/design-graphic-card.jpg'],
+            ['slug' => 'video',   'label_key' => 'card.design.video.title',   'teaser_key' => 'card.design.video.teaser',   'icon' => 'clapperboard', 'href' => '/design/video/',   'photo' => 'images/design-video-card.jpg'],
         ],
     ],
     [
         'slug'      => 'solutions',
         'label_key' => 'nav.solutions',
         'items'     => [
-            ['slug' => 'consulting', 'label_key' => 'card.solutions.consulting.title', 'teaser_key' => 'card.solutions.consulting.teaser', 'icon' => '💼', 'href' => '/solutions/consulting/', 'photo' => 'images/solutions-consulting.jpg'],
-            ['slug' => 'automation', 'label_key' => 'card.solutions.automation.title', 'teaser_key' => 'card.solutions.automation.teaser', 'icon' => '⚙️', 'href' => '/solutions/automation/', 'photo' => 'images/solutions-automation.jpg'],
-            ['slug' => 'website',    'label_key' => 'card.solutions.website.title',    'teaser_key' => 'card.solutions.website.teaser',    'icon' => '🖥️', 'href' => '/solutions/website/',    'photo' => 'images/solutions-website.jpg'],
-            ['slug' => 'apps',       'label_key' => 'card.solutions.apps.title',       'teaser_key' => 'card.solutions.apps.teaser',       'icon' => '📱', 'href' => '/solutions/apps/',       'photo' => 'images/solutions-apps.jpg'],
+            ['slug' => 'consulting', 'label_key' => 'card.solutions.consulting.title', 'teaser_key' => 'card.solutions.consulting.teaser', 'icon' => 'briefcase',  'href' => '/solutions/consulting/', 'photo' => 'images/solutions-consulting.jpg'],
+            ['slug' => 'automation', 'label_key' => 'card.solutions.automation.title', 'teaser_key' => 'card.solutions.automation.teaser', 'icon' => 'settings',   'href' => '/solutions/automation/', 'photo' => 'images/solutions-automation.jpg'],
+            ['slug' => 'website',    'label_key' => 'card.solutions.website.title',    'teaser_key' => 'card.solutions.website.teaser',    'icon' => 'monitor',    'href' => '/solutions/website/',    'photo' => 'images/solutions-website.jpg'],
+            ['slug' => 'apps',       'label_key' => 'card.solutions.apps.title',       'teaser_key' => 'card.solutions.apps.teaser',       'icon' => 'smartphone', 'href' => '/solutions/apps/',       'photo' => 'images/solutions-apps.jpg'],
         ],
     ],
     [

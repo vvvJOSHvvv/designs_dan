@@ -4,12 +4,14 @@ $pageTitle = t('card.solutions.apps.title') . ' | DESIGN DAN';
 $pageDescription = t('detail.solutions.apps.intro');
 $activeNav = 'solutions';
 $isDetailPage = true;
+$isDetailFit = true;
+$ogImage = 'images/solutions-apps.jpg'; // 카카오톡·SNS 공유 시 이 페이지 대표 이미지
 require __DIR__ . '/../../includes/header.php';
 
 $detailParentSlug = 'solutions';
 $detailTitleKey   = 'card.solutions.apps.title';
 $detailIntroKey   = 'detail.solutions.apps.intro';
-$detailIcon       = '📱';
+$detailIcon       = 'smartphone';
 ?>
 <main>
 <?php require __DIR__ . '/../../includes/detail-hero.php'; ?>
@@ -24,7 +26,7 @@ $detailIcon       = '📱';
          * (그 다음부터는 이 배열이 비어있지 않으니 자동으로 "준비 중" 문구 대신 카드가 보입니다.)
          *
          * $apps[] = [
-         *     'icon'    => '🎙️',                          // 카드에 보일 이모지 아이콘
+         *     'icon'    => 'mic',                           // 카드에 보일 선형 아이콘 이름 (includes/icons.php 참고)
          *     'name_en' => 'Group Call',                    // 영어 이름
          *     'name_ko' => '그룹통화',                       // 한글 이름
          *     'desc_en' => 'Voice group calling app.',       // 영어 한 줄 설명
@@ -38,7 +40,7 @@ $detailIcon       = '📱';
 
         <?php if (empty($apps)): ?>
             <div class="empty-state">
-                <div class="empty-state__icon">📱</div>
+                <div class="empty-state__icon"><?= icon('smartphone') ?></div>
                 <h3><?= te('detail.solutions.apps.empty_title') ?></h3>
                 <p><?= te('detail.solutions.apps.empty_desc') ?></p>
             </div>
@@ -53,7 +55,7 @@ $detailIcon       = '📱';
                     <a class="card app-card<?= $isSoon ? ' app-card--soon' : '' ?>"
                        href="<?= $isSoon ? '#' : htmlspecialchars($app['url']) ?>"
                        <?= $isSoon ? 'aria-disabled="true" onclick="return false;"' : 'target="_blank" rel="noopener"' ?>>
-                        <div class="card__icon"><?= htmlspecialchars($app['icon']) ?></div>
+                        <div class="card__icon"><?= icon($app['icon']) ?></div>
                         <h3><?= htmlspecialchars($name) ?></h3>
                         <p><?= htmlspecialchars($desc) ?></p>
                         <?php if ($isSoon): ?>

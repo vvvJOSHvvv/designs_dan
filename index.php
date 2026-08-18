@@ -23,10 +23,10 @@ $solutionsTab = findNavTab('solutions');
                 <p><?= te('about.p1') ?></p>
                 <p><?= te('about.p2') ?></p>
                 <div class="about__pills">
-                    <span class="pill">👤 <?= te('about.pill.client') ?></span>
-                    <span class="pill">💡 <?= te('about.pill.expertise') ?></span>
-                    <span class="pill">💡 <?= te('about.pill.innovation') ?></span>
-                    <span class="pill">🛡️ <?= te('about.pill.trust') ?></span>
+                    <span class="pill"><?= icon('user') ?> <?= te('about.pill.client') ?></span>
+                    <span class="pill"><?= icon('lightbulb') ?> <?= te('about.pill.expertise') ?></span>
+                    <span class="pill"><?= icon('lightbulb') ?> <?= te('about.pill.innovation') ?></span>
+                    <span class="pill"><?= icon('shield_check') ?> <?= te('about.pill.trust') ?></span>
                 </div>
                 <a class="btn btn--accent" data-tab="contact" href="<?= url('/') ?>#contact"><?= te('about.cta') ?> →</a>
             </div>
@@ -51,7 +51,7 @@ $solutionsTab = findNavTab('solutions');
                             <div class="service-card__photo"><img src="<?= asset($item['photo']) ?>" alt="<?= htmlspecialchars(t($item['label_key'])) ?>" loading="lazy"></div>
                         <?php endif; ?>
                         <div class="service-card__head">
-                            <div class="service-card__icon"><?= $item['icon'] ?></div>
+                            <div class="service-card__icon"><?= icon($item['icon']) ?></div>
                             <h3><?= te($item['label_key']) ?></h3>
                         </div>
                         <p><?= te($item['teaser_key']) ?></p>
@@ -77,7 +77,7 @@ $solutionsTab = findNavTab('solutions');
                             <div class="service-card__photo"><img src="<?= asset($item['photo']) ?>" alt="<?= htmlspecialchars(t($item['label_key'])) ?>" loading="lazy"></div>
                         <?php endif; ?>
                         <div class="service-card__head">
-                            <div class="service-card__icon"><?= $item['icon'] ?></div>
+                            <div class="service-card__icon"><?= icon($item['icon']) ?></div>
                             <h3><?= te($item['label_key']) ?></h3>
                         </div>
                         <p><?= te($item['teaser_key']) ?></p>
@@ -103,7 +103,7 @@ $solutionsTab = findNavTab('solutions');
                             <div class="service-card__photo"><img src="<?= asset($item['photo']) ?>" alt="<?= htmlspecialchars(t($item['label_key'])) ?>" loading="lazy"></div>
                         <?php endif; ?>
                         <div class="service-card__head">
-                            <div class="service-card__icon"><?= $item['icon'] ?></div>
+                            <div class="service-card__icon"><?= icon($item['icon']) ?></div>
                             <h3><?= te($item['label_key']) ?></h3>
                         </div>
                         <p><?= te($item['teaser_key']) ?></p>
@@ -129,14 +129,14 @@ $solutionsTab = findNavTab('solutions');
                     $catDesc = $LANG === 'ko' ? $cat['desc_ko'] : $cat['desc_en'];
                     ?>
                     <div class="card resource-card">
-                        <div class="card__icon"><?= $cat['icon'] ?></div>
+                        <div class="card__icon"><?= icon($cat['icon']) ?></div>
                         <h3><?= htmlspecialchars($catName) ?></h3>
                         <p><?= htmlspecialchars($catDesc) ?></p>
                         <?php if (!empty($cat['files'])): ?>
                             <ul class="resource-card__files">
                                 <?php foreach ($cat['files'] as $f): ?>
                                     <?php $fileName = $LANG === 'ko' ? $f['name_ko'] : $f['name_en']; ?>
-                                    <li><a href="<?= asset('resources/' . $f['file']) ?>" download><?= htmlspecialchars($fileName) ?> ⬇</a></li>
+                                    <li><a href="<?= asset('resources/' . $f['file']) ?>" download><?= htmlspecialchars($fileName) ?> <?= icon('download') ?></a></li>
                                 <?php endforeach; ?>
                             </ul>
                         <?php else: ?>
@@ -160,19 +160,19 @@ $solutionsTab = findNavTab('solutions');
             <div class="contact">
                 <div>
                     <div class="contact__info-item">
-                        <div>📧</div>
+                        <div class="contact-icon"><?= icon('mail') ?></div>
                         <div><p class="label"><?= te('contact.label.email') ?></p><p class="value"><a href="mailto:designdan2020@gmail.com">designdan2020@gmail.com</a></p></div>
                     </div>
                     <div class="contact__info-item">
-                        <div>📞</div>
+                        <div class="contact-icon"><?= icon('phone') ?></div>
                         <div><p class="label"><?= te('contact.label.phone') ?></p><p class="value"><a href="tel:+639455997774">+63-94-5599-7774</a></p></div>
                     </div>
                     <div class="contact__info-item">
-                        <div>📷</div>
+                        <div class="contact-icon"><?= icon('camera') ?></div>
                         <div><p class="label"><?= te('contact.label.instagram') ?></p><p class="value"><a href="https://instagram.com/design_dan2020" target="_blank" rel="noopener">@design_dan2020</a></p></div>
                     </div>
                     <div class="contact__info-item">
-                        <div>🕘</div>
+                        <div class="contact-icon"><?= icon('clock') ?></div>
                         <div><p class="label"><?= te('contact.label.hours') ?></p><p class="value"><?= te('contact.hours.value') ?></p></div>
                     </div>
                 </div>
@@ -211,6 +211,16 @@ $solutionsTab = findNavTab('solutions');
                             <p class="field__hint"><?= te('contact.form.password_hint') ?></p>
                         </div>
                     </div>
+                    <?php /* 스팸봇 방지 (2026-08-16 추가): 사람 눈엔 안 보이는 허니팟 필드 —
+                             자동 입력 봇은 폼의 모든 필드를 채우는 경우가 많아서, 이 칸이
+                             채워져 있으면 봇으로 간주하고 서버에서 조용히 무시한다
+                             (actions/inquiry-submit.php 참고). 타임스탬프는 "폼이 열리고
+                             몇 초 안 지나 바로 제출"되는 초고속 자동 제출을 걸러낸다. */ ?>
+                    <div class="hp-field" aria-hidden="true">
+                        <label for="cWebsite">Website</label>
+                        <input type="text" id="cWebsite" name="website" tabindex="-1" autocomplete="off">
+                    </div>
+                    <input type="hidden" name="form_ts" value="<?= time() ?>">
                     <button type="submit" class="btn btn--primary" style="margin-top:10px;width:100%;justify-content:center;"><?= te('contact.form.submit') ?></button>
                     <p class="form-note"><?= te('contact.form.note') ?></p>
                 </form>

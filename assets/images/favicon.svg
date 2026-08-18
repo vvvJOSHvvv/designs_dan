@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="DESIGN DAN">
+  <!-- 파비콘 (2026-08-16 추가) — 브랜드 톤(어두운 배경 + 금색)에 맞춘 "D" 모노그램 +
+       건축 도면 느낌의 얇은 보조선. 순수 SVG라 별도 이미지 파일/저작권 이슈 없음. -->
+  <rect width="64" height="64" rx="14" fill="#101012"/>
+  <!-- 얇은 블루프린트 격자 (아주 옅게) -->
+  <g stroke="#f2b705" stroke-opacity="0.16" stroke-width="1">
+    <path d="M0 22h64M0 42h64M22 0v64M42 0v64"/>
+  </g>
+  <!-- D 모노그램 -->
+  <path d="M20 15h11c10.5 0 17 6.6 17 17s-6.5 17-17 17H20z"
+        fill="none" stroke="#f2b705" stroke-width="6" stroke-linejoin="round"/>
+</svg>

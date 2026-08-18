@@ -96,6 +96,13 @@ function db_init_schema(PDO $pdo, string $driver): void
                 quote_text TEXT,
                 created_at TIMESTAMP NOT NULL DEFAULT NOW()
             );
+            CREATE TABLE IF NOT EXISTS rate_limit_attempts (
+                id SERIAL PRIMARY KEY,
+                scope TEXT NOT NULL,
+                identifier TEXT NOT NULL,
+                created_at TIMESTAMP NOT NULL DEFAULT NOW()
+            );
+            CREATE INDEX IF NOT EXISTS idx_rate_limit_lookup ON rate_limit_attempts (scope, identifier, created_at);
         ");
     } else {
         $pdo->exec("
@@ -125,6 +132,13 @@ function db_init_schema(PDO $pdo, string $driver): void
                 quote_text TEXT,
                 created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
             );
+            CREATE TABLE IF NOT EXISTS rate_limit_attempts (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                scope TEXT NOT NULL,
+                identifier TEXT NOT NULL,
+                created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+            );
+            CREATE INDEX IF NOT EXISTS idx_rate_limit_lookup ON rate_limit_attempts (scope, identifier, created_at);
         ");
     }
 }

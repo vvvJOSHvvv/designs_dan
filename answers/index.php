@@ -3,14 +3,21 @@ require __DIR__ . '/../config.php';
 require __DIR__ . '/../includes/db.php';
 require __DIR__ . '/../includes/answers-data.php';
 require __DIR__ . '/../includes/mask.php';
+require __DIR__ . '/../includes/error-page.php';
+
+// DB를 먼저 읽고 나서 화면을 그린다 — 헤더가 이미 출력된 뒤에 DB 오류가 나면
+// 에러 페이지를 제대로 그릴 수 없기 때문(renderErrorPage가 헤더를 직접 그린다).
+try {
+    $inquiries = listInquiries();
+} catch (Throwable $e) {
+    renderDbErrorPage($e);
+}
 
 $pageTitle = t('answers.title') . ' | DESIGN DAN';
 $pageDescription = t('answers.intro');
 $activeNav = 'answers';
 $isDetailPage = true;
 require __DIR__ . '/../includes/header.php';
-
-$inquiries = listInquiries();
 ?>
 <main>
 <section class="detail-hero">
@@ -26,7 +33,7 @@ $inquiries = listInquiries();
     <div class="container">
         <?php if (empty($inquiries)): ?>
             <div class="empty-state">
-                <div class="empty-state__icon">💬</div>
+                <div class="empty-state__icon"><?= icon('message_circle') ?></div>
                 <p><?= te('answers.empty') ?></p>
             </div>
         <?php else: ?>
@@ -39,7 +46,7 @@ $inquiries = listInquiries();
                     <li>
                         <a class="answer-list__row" href="<?= url('/answers/view.php') ?>?id=<?= (int) $row['id'] ?>">
                             <span class="answer-list__title">
-                                <?php if (!empty($row['is_locked'])): ?><span class="answer-list__lock">🔒</span><?php endif; ?>
+                                <?php if (!empty($row['is_locked'])): ?><span class="answer-list__lock"><?= icon('lock') ?></span><?php endif; ?>
                                 <?= htmlspecialchars(maskName($row['name'])) ?> · <?= $typeLabel ?>
                             </span>
                             <span class="answer-list__meta">

@@ -1,0 +1,12 @@
+# DESIGN DAN (designs-dan.com) — 검색엔진 크롤러 안내 (2026-08-16 추가)
+
+User-agent: *
+Allow: /
+
+# 관리자 화면과 폼 처리 엔드포인트는 검색 결과에 노출될 필요가 없습니다.
+Disallow: /admin/
+Disallow: /actions/
+# 로컬 개발용 SQLite 폴더 (Apache에서도 차단하지만 크롤러에게도 알려둡니다)
+Disallow: /data/
+
+Sitemap: https://designs-dan.com/sitemap.xml

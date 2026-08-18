@@ -6,9 +6,8 @@
  * (session_start()는 HTTP 헤더가 나가기 전에 호출되어야 함) — admin/*.php 맨 위에서만 사용.
  */
 
-if (session_status() !== PHP_SESSION_ACTIVE) {
-    session_start();
-}
+require_once __DIR__ . '/session-boot.php';
+startAppSession();
 
 function isAdminLoggedIn(): bool
 {

@@ -3,26 +3,34 @@ require __DIR__ . '/../config.php';
 require __DIR__ . '/../includes/db.php';
 require __DIR__ . '/../includes/answers-data.php';
 require __DIR__ . '/../includes/auth.php';
+require __DIR__ . '/../includes/csrf.php';
+require __DIR__ . '/../includes/error-page.php';
 requireAdminLogin();
 
 $id = (int) ($_GET['id'] ?? 0);
-$inquiry = $id > 0 ? getInquiry($id) : null;
 
-if ($inquiry && $_SERVER['REQUEST_METHOD'] === 'POST') {
-    $replyMessage = trim($_POST['reply_message'] ?? '');
-    $quoteText = trim($_POST['quote_text'] ?? '');
-    if ($replyMessage !== '') {
-        addReply($id, currentAdminUsername(), $replyMessage, $quoteText);
-        header('Location: ' . url('/admin/view.php') . '?id=' . $id);
-        exit;
+try {
+    $inquiry = $id > 0 ? getInquiry($id) : null;
+
+    if ($inquiry && $_SERVER['REQUEST_METHOD'] === 'POST' && csrfCheck($_POST['csrf_token'] ?? '')) {
+        $replyMessage = trim($_POST['reply_message'] ?? '');
+        $quoteText = trim($_POST['quote_text'] ?? '');
+        if ($replyMessage !== '') {
+            addReply($id, currentAdminUsername(), $replyMessage, $quoteText);
+            header('Location: ' . url('/admin/view.php') . '?id=' . $id);
+            exit;
+        }
     }
-}
 
-$replies = $inquiry ? getRepliesFor($inquiry['id']) : [];
+    $replies = $inquiry ? getRepliesFor($inquiry['id']) : [];
+} catch (Throwable $e) {
+    renderDbErrorPage($e);
+}
 
 $pageTitle = t('admin.dashboard.title') . ' | DESIGN DAN';
 $activeNav = '';
 $isDetailPage = true;
+$isNoIndex = true;   // 관리자 화면은 검색엔진에 노출 안 함
 require __DIR__ . '/../includes/header.php';
 ?>
 <main>
@@ -57,7 +65,7 @@ require __DIR__ . '/../includes/header.php';
                 <p style="white-space:pre-wrap;margin-bottom:14px;"><?= nl2br(htmlspecialchars($inquiry['message'])) ?></p>
 
                 <p class="answer-detail__label"><?= te('answers.field.date') ?></p>
-                <p><?= htmlspecialchars(substr($inquiry['created_at'], 0, 10)) ?><?= !empty($inquiry['is_locked']) ? ' · 🔒' : '' ?></p>
+                <p><?= htmlspecialchars(substr($inquiry['created_at'], 0, 10)) ?><?= !empty($inquiry['is_locked']) ? ' · ' . icon('lock') : '' ?></p>
             </div>
 
             <?php if (!empty($replies)): ?>
@@ -76,6 +84,7 @@ require __DIR__ . '/../includes/header.php';
             <div class="card">
                 <p class="answer-detail__label" style="margin-bottom:10px;"><?= te('admin.reply.heading') ?></p>
                 <form method="post" class="form-grid">
+                    <?= csrfField() ?>
                     <div class="field field--full">
                         <label for="replyMessage"><?= te('admin.reply.message.label') ?></label>
                         <textarea id="replyMessage" name="reply_message" required style="min-height:120px;"></textarea>

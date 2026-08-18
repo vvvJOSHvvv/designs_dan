@@ -33,6 +33,9 @@ function url(string $path = ''): string
 // 한/영 전환 (t()/te() 헬퍼가 여기서 나옵니다 — 아래 services.php보다 먼저 불러와야 함)
 require_once __DIR__ . '/includes/lang.php';
 
+// 선형 아이콘 모음 (icon() 헬퍼 — 2026-08-15, 이모지 아이콘을 전부 대체하면서 추가)
+require_once __DIR__ . '/includes/icons.php';
+
 // 서비스 카테고리 & 네비게이션 데이터 (상단 드롭다운 메뉴가 여기서 나옵니다)
 require_once __DIR__ . '/includes/services.php';
 

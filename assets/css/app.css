@@ -38,6 +38,44 @@
 }
 
 * { box-sizing: border-box; }
+
+/* 문의 폼 스팸봇 방지용 허니팟 필드 (2026-08-16 추가) — 사람에게는 안 보이지만
+   DOM에는 존재해서, 폼을 자동으로 다 채우는 봇만 걸려든다. display:none은 일부
+   봇이 감지해서 건너뛰므로 화면 밖으로 밀어내는 방식을 쓴다. */
+.hp-field {
+    position: absolute;
+    left: -9999px;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+}
+
+/* ---------- 선형 아이콘 (2026-08-15: 이모지 -> Lucide 기반 SVG 전면 교체) ----------
+   includes/icons.php의 icon() 헬퍼가 출력하는 <svg class="icon">의 기본 크기.
+   기본값은 글자 크기(1em)를 따라가도록 해서 텍스트 옆에 자연스럽게 놓이고,
+   카드 배지처럼 자체 박스 안에 들어가는 아이콘은 아래에서 컨테이너별로
+   명시적인 px 크기를 지정해 예전 이모지와 비슷한 시각적 비중을 맞췄다. */
+.icon {
+    width: 1em;
+    height: 1em;
+    display: inline-block;
+    flex-shrink: 0;
+    vertical-align: -0.125em;
+}
+.service-card__icon .icon { width: 22px; height: 22px; }
+.card__icon .icon { width: 22px; height: 22px; }
+.empty-state__icon { display: flex; align-items: center; justify-content: center; }
+.empty-state__icon .icon { width: 34px; height: 34px; }
+.automation__feature-icon .icon { width: 20px; height: 20px; }
+.process-step__icon .icon { width: 18px; height: 18px; }
+.answer-list__lock .icon { width: 14px; height: 14px; vertical-align: -0.15em; }
+.pill .icon { width: 14px; height: 14px; }
+.contact-icon { flex-shrink: 0; width: 40px; height: 40px; border-radius: 10px; background: var(--color-bg-cream); display: flex; align-items: center; justify-content: center; }
+.contact-icon .icon { width: 20px; height: 20px; color: var(--color-text); }
+.detail-hero__icon { display: inline-flex; width: 0.85em; height: 0.85em; vertical-align: -0.12em; }
+.detail-hero__icon .icon { width: 100%; height: 100%; }
+.nav__lang .icon, .nav__mobile-lang .icon { width: 14px; height: 14px; }
+.resource-card__files .icon { width: 13px; height: 13px; vertical-align: -0.15em; }
 html { scroll-behavior: smooth; height: 100%; }
 /* body를 세로 flex 컨테이너로 만들어서 footer가 항상 화면(뷰포트) 맨 아래에 붙게 한다.
    내용이 짧은 탭(패널)이어도 footer 아래로 흰 배경이 보이지 않고, 내용이 길어지면
@@ -65,9 +103,7 @@ body.page-home main {
        고정 그라데이션 배경이 이 <main> 뒤로 그대로 비쳐 보인다 */
     background: transparent;
 }
-/* 2026-08-14: 상세 페이지(9개)도 같은 이유로 흰 배경을 지운다. 다만 상세 페이지는
-   탭처럼 세로 가운데 정렬할 필요가 없어서(카드가 여러 개라 자연스럽게 위→아래로
-   흐르면 됨) body.page-home .panel.is-active 같은 flex 정렬 규칙은 가져오지 않는다. */
+/* 2026-08-14: 상세 페이지(9개 카드 상세 + admin/answers)도 같은 이유로 흰 배경을 지운다. */
 body.page-detail main { background: transparent; }
 /* 탭 내용(카드/폼 등)이 화면 위쪽에 쏠려 보이지 않도록, 지금 보이는 탭을 세로 방향
    가운데 정렬한다. flex-shrink가 0(= "flex: 1 0 auto"의 0)이라서 내용이 화면보다 길면
@@ -75,6 +111,20 @@ body.page-detail main { background: transparent; }
    짧을 때만 남는 공간의 가운데로 이동한다 — 화면 크기·내용 길이가 달라져도 별도 계산 없이
    자동으로 반응한다. */
 body.page-home .panel.is-active {
+    flex: 1 0 auto;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+/* 카드 상세 페이지(9개) 스크롤 없이 한 화면에 맞추기 (2026-08-16 추가)
+   사용자가 "건축>설계 같은 상세 페이지도 스크롤 없이 보고 싶다"고 요청 — 홈 탭과
+   똑같은 원리를 상세 페이지에도 적용했다. admin/answers 페이지는 내용 길이가
+   들쭉날쭉해서(문의 개수, 답변 길이 등) 이 압축을 적용하면 오히려 어색해지므로
+   제외했다 — 그래서 $isDetailPage와 별도로 $isDetailFit 플래그를 만들어서
+   9개 카드 상세 페이지에만 body.page-detail-fit 클래스가 붙게 했다
+   (includes/header.php 참고). */
+body.page-detail-fit main {
     flex: 1 0 auto;
     display: flex;
     flex-direction: column;
@@ -159,7 +209,6 @@ button { font-family: inherit; cursor: pointer; }
     border-color: rgba(255,255,255,.35);
     color: inherit;
 }
-.btn--outline-dark { border-color: rgba(24,24,27,.2); color: var(--color-text); }
 
 .pill {
     display: inline-flex;
@@ -270,7 +319,6 @@ button { font-family: inherit; cursor: pointer; }
     font-size: 13px;
     font-weight: 600;
 }
-.nav__mobile-group { font-size: 11px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--color-text-inverse-muted); margin: 14px 0 4px; }
 .nav__mobile-link { display: flex; align-items: center; gap: 8px; padding: 12px 4px; color: #fff; font-size: 16px; font-weight: 700; border-bottom: 1px solid rgba(255,255,255,.08); }
 .nav__mobile-link--active { color: var(--color-accent); }
 .nav__mobile.is-open { display: flex; }
@@ -301,7 +349,6 @@ button { font-family: inherit; cursor: pointer; }
    동일한 값으로 맞췄다. */
 .panel { display: none; padding: 48px 0 80px; scroll-margin-top: 84px; }
 .panel.is-active { display: block; }
-.section--tight { padding: 72px 0; }
 .section--cream { background: var(--color-bg-cream); color: var(--color-text); }
 .section--dark {
     background: var(--color-bg-dark);
@@ -313,27 +360,6 @@ button { font-family: inherit; cursor: pointer; }
 .section-head { max-width: 640px; margin: 0 0 clamp(14px, 3vh, 26px); }
 .section-head h2 { font-family: var(--font-display); font-size: clamp(28px, 3.4vw, 40px); font-weight: 700; line-height: 1.18; letter-spacing: -.01em; }
 .section-head__intro { margin-top: 6px; color: var(--color-text-muted); max-width: 560px; }
-.section-head--split { max-width: none; display: flex; align-items: flex-end; justify-content: space-between; gap: 32px; flex-wrap: wrap; }
-.section-head--split p { max-width: 320px; color: var(--color-text-muted); }
-
-/* ---------- 히어로 ---------- */
-.hero {
-    position: relative;
-    min-height: 92vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-    background: linear-gradient(180deg, rgba(8,8,9,.55), rgba(8,8,9,.82)), var(--color-bg-dark) center/cover no-repeat;
-    color: #fff;
-    margin-top: -84px;
-    padding-top: 84px;
-}
-.hero__inner { max-width: 720px; padding: 0 24px; }
-.hero h1 { font-family: var(--font-display); font-size: clamp(40px, 6vw, 68px); font-weight: 700; line-height: 1.08; letter-spacing: -.02em; }
-.hero h1 .accent { color: var(--color-accent); }
-.hero p { margin: 26px auto 0; max-width: 560px; color: rgba(255,255,255,.72); font-size: 17px; }
-.hero .btn { margin-top: 34px; }
 
 /* ---------- About ---------- */
 /* 2026-08-12: 문의하기 탭처럼 회사소개 탭도 화면 안에 딱 맞아야 세로 가운데 정렬이
@@ -345,22 +371,9 @@ button { font-family: inherit; cursor: pointer; }
 .about__copy p { color: var(--color-text-muted); margin-bottom: 10px; font-size: 15.5px; }
 .about__pills { display: flex; flex-wrap: wrap; gap: 10px; margin: 16px 0 20px; }
 .about__media img { border-radius: var(--radius-lg); }
-.media-placeholder {
-    border-radius: var(--radius-lg);
-    aspect-ratio: 4 / 3;
-    background: linear-gradient(135deg, var(--color-bg-cream), #ece4d6);
-    display: flex; align-items: center; justify-content: center;
-    color: var(--color-text-soft);
-    font-size: 13px;
-    font-weight: 600;
-    text-align: center;
-    padding: 24px;
-}
-/* 회사소개 탭 실사진 (2026-08-13 추가) — 예전엔 "사진 준비되면 교체" 안내
-   박스(.media-placeholder)였는데, imge/메인 이미지.png(실제 건축 사진)가
-   생겨서 그 자리에 넣었다. .media-placeholder와 동일한 4:3 비율·둥근 모서리를
-   유지해서 레이아웃은 그대로, 안내 텍스트 박스만 실사진으로 바뀐 것처럼
-   보이게 했다. */
+/* 회사소개 탭 실사진 (2026-08-13 추가) — 예전엔 "사진 준비되면 교체" 안내 박스
+   (.media-placeholder, 실사진이 생기면서 삭제됨)였는데, 실제 건축 사진이 생겨서
+   그 자리에 넣었다. 4:3 비율·둥근 모서리는 그대로 유지했다. */
 .about__media-photo {
     display: block;
     width: 100%;
@@ -398,11 +411,6 @@ button { font-family: inherit; cursor: pointer; }
     background: rgba(255,255,255,.06);
     border: 1px solid rgba(255,255,255,.16);
     color: var(--color-text-inverse);
-}
-.panel--brand-bg .media-placeholder {
-    background: linear-gradient(135deg, rgba(255,255,255,.07), rgba(255,255,255,.02));
-    border: 1px solid rgba(242,183,5,.28);
-    color: var(--color-text-inverse-muted);
 }
 /* 건축/디자인/솔루션/문의하기 탭의 상단 제목 영역(.section-head) */
 .panel--brand-bg .section-head h2 { color: #fff; }
@@ -540,6 +548,114 @@ button { font-family: inherit; cursor: pointer; }
    달라고 해서 이 두 규칙은 제거했다. 실사진은 이제 배경이 아니라 카드 위쪽
    사진(.service-card__photo)으로만 쓴다 — 5개 탭 전부 다시 body.page-home의
    공용 배경 하나로 통일됨. */
+
+/* 카드 상세 페이지(9개) 여백 압축 — 스크롤 없이 한 화면에 맞추기 (2026-08-16 추가)
+   .page-detail-fit 안에서만 적용되므로(body.page-detail-fit, includes/header.php의
+   $isDetailFit 참고) admin/answers나 홈 탭 등 다른 곳의 .card/.section/.process 등은
+   전혀 영향 없다. 홈 탭 압축과 같은 방식으로 vh 기준 clamp()를 써서, 화면이 낮으면
+   자동으로 더 줄어들고 화면이 넉넉하면 원래보다 살짝 여유 있는 값으로 돌아온다.
+   컨설팅(카드 6개+4단계 프로세스), 그래픽(카드 2개+프로젝트+4단계 프로세스)처럼
+   내용이 많은 페이지 기준으로 값을 맞췄다 — 내용이 적은 페이지는 세로 중앙 정렬
+   (위 body.page-detail-fit main 규칙) 덕분에 화면 가운데 예쁘게 떠 보인다. */
+/* ★ 값은 거의 전부 clamp(최소, vh 기준, 최대) 형태로 잡는다 (2026-08-16 2차 수정).
+   1차 때는 대부분 고정 px이라, 900px 화면에 맞추려고 작게 잡은 값이 1150px 같은
+   큰 화면에서도 그대로 작게 남았다 — 그래서 "글씨는 깨알같이 작은데 위아래 빈
+   공간만 400px 넘게 남는" 답답한 화면이 됐다(사용자가 컨설팅 페이지 스크린샷으로
+   지적). vh 기준으로 바꾸면 화면이 커질수록 글씨·여백·사진이 같이 커져서 남는
+   공간을 실제로 채운다. 새 값을 추가할 때도 되도록 이 패턴을 따를 것. */
+/* ★ 계수(vh 숫자)는 "900px 화면에서 예전에 딱 맞던 값"이 그대로 나오도록 잡고,
+   최대값(clamp의 세 번째)만 넉넉하게 열어둔다. 900px에서 1vh = 9px이므로
+   "예전 픽셀값 ÷ 9"가 계수가 된다 — 이렇게 하면 900px에서는 지금처럼 딱 맞고,
+   1150px 같은 큰 화면에서는 남는 공간만큼 자연스럽게 커진다. 2차 수정 때 계수를
+   같이 키웠다가 900px에서 전부 넘쳐버려서, 계수는 되돌리고 최대값만 여는 방식으로
+   다시 잡았다. */
+.page-detail-fit .detail-hero { padding: clamp(6px, 1.2vh, 22px) 0 0; }
+.page-detail-fit .detail-back { margin-bottom: clamp(5px, 0.6vh, 12px); font-size: clamp(12.5px, 1.4vh, 14px); }
+.page-detail-fit .detail-hero h1 { font-size: clamp(19px, 2.6vh, 32px); margin-top: clamp(2px, 0.3vh, 7px); }
+.page-detail-fit .detail-hero__intro { margin-top: clamp(3px, 0.4vh, 10px); font-size: clamp(13.5px, 1.5vh, 16px); }
+.page-detail-fit .detail-hero__photo { margin-top: clamp(10px, 1.5vh, 24px); }
+/* 사진이 있는 3개 페이지(건축>설계/항공측량/시공)는 카드가 2~3개뿐이라 세로 여유가
+   많다 — 그 여유를 빈 공간이 아니라 사진이 채우도록 크게 잡는다. */
+.page-detail-fit .detail-hero__photo img { height: clamp(110px, 21vh, 340px); }
+.page-detail-fit .section { padding: clamp(6px, 1.2vh, 20px) 0; }
+.page-detail-fit .detail-cta { margin-top: clamp(8px, 1vh, 20px); }
+.page-detail-fit .section-head { margin-bottom: clamp(6px, 1.2vh, 16px); }
+.page-detail-fit .section-head h2 { font-size: clamp(17px, 2.2vh, 26px); }
+.page-detail-fit .section-head__intro { margin-top: clamp(3px, 0.4vh, 8px); font-size: clamp(13px, 1.45vh, 15px); }
+/* 버튼(문의하기 CTA 등) — .detail-cta/.process-foot/.automation__cta 안의
+   버튼 전부 이 규칙을 탄다. */
+.page-detail-fit .btn { padding: clamp(9px, 1.1vh, 14px) clamp(18px, 2vw, 26px); font-size: clamp(13px, 1.5vh, 14.5px); }
+.page-detail-fit .card-grid,
+.page-detail-fit .gd-steps { gap: clamp(10px, 1.2vh, 22px); }
+.page-detail-fit .card { padding: clamp(11px, 1.5vh, 28px); }
+.page-detail-fit .card__icon { width: clamp(28px, 3.2vh, 44px); height: clamp(28px, 3.2vh, 44px); margin-bottom: clamp(6px, 0.8vh, 18px); }
+.page-detail-fit .card__icon .icon { width: 50%; height: 50%; }
+.page-detail-fit .card h3 { font-size: clamp(14.5px, 1.6vh, 19px); margin-bottom: clamp(3px, 0.4vh, 10px); }
+.page-detail-fit .card p { font-size: clamp(12px, 1.3vh, 14.5px); margin-bottom: clamp(5px, 0.65vh, 16px); }
+/* 컨설팅 카드 6개는 3칸 2줄로 놓으면 900px 화면에서 300px 넘게 넘쳐서(카드 줄이
+   하나 더 생기는 셈) 도저히 안 들어간다 — 화면이 넓을 때는 한 줄(6칸)을 유지하되,
+   카드 안쪽 글자·여백을 vh 기준으로 잡아 화면이 높아질수록 같이 커지게 했다.
+   (좁은 화면에서는 아래쪽 반응형 미디어쿼리가 2열/1열로 쌓아준다. 이 규칙이
+   클래스 2개짜리라 미디어쿼리 안의 1개짜리보다 우선순위가 높아서, min-width로
+   감싸지 않으면 모바일에서도 6열로 찌그러진다 — 실제로 겪은 버그다.) */
+@media (min-width: 901px) {
+    .page-detail-fit .consulting-grid { grid-template-columns: repeat(6, 1fr); gap: clamp(6px, 0.9vh, 14px); }
+}
+.page-detail-fit .consulting-grid .card { padding: clamp(5px, 0.55vh, 16px) clamp(7px, 0.78vh, 18px); }
+.page-detail-fit .consulting-grid .card h3 { font-size: clamp(12.5px, 1.38vh, 16px); margin-bottom: clamp(1px, 0.15vh, 6px); line-height: 1.22; }
+.page-detail-fit .consulting-grid .card p { font-size: clamp(10.5px, 1.16vh, 13px); min-height: 0; margin-bottom: clamp(2px, 0.25vh, 9px); line-height: 1.28; }
+.page-detail-fit .consulting-grid .card__icon { width: clamp(18px, 2vh, 34px); height: clamp(18px, 2vh, 34px); margin-bottom: clamp(3px, 0.33vh, 9px); }
+.page-detail-fit .consulting-grid .card__tags { gap: clamp(2px, 0.28vh, 6px); }
+.page-detail-fit .consulting-grid .tag { padding: clamp(2px, 0.22vh, 5px) clamp(7px, 0.8vw, 11px); font-size: clamp(10px, 1.11vh, 12px); }
+.page-detail-fit .card__tags { gap: clamp(5px, 0.6vh, 8px); }
+.page-detail-fit .tag { padding: clamp(3px, 0.4vh, 6px) clamp(9px, 1vw, 13px); font-size: clamp(11px, 1.25vh, 12.5px); }
+.page-detail-fit .gd-projects { margin-top: clamp(4px, 0.5vh, 12px); gap: clamp(6px, 0.8vh, 10px); }
+.page-detail-fit .process { padding: clamp(6px, 0.8vh, 30px); }
+.page-detail-fit .process-head { margin-bottom: clamp(4px, 0.55vh, 20px); }
+.page-detail-fit .process-head h2 { font-size: clamp(15px, 1.9vh, 26px); }
+.page-detail-fit .process-head p { font-size: clamp(12.5px, 1.4vh, 14.5px); }
+.page-detail-fit .process-steps { gap: clamp(8px, 0.9vh, 24px); }
+.page-detail-fit .process-step__top { margin-bottom: clamp(2px, 0.3vh, 12px); }
+.page-detail-fit .process-step__icon { width: clamp(22px, 2.6vh, 34px); height: clamp(22px, 2.6vh, 34px); }
+.page-detail-fit .process-step__icon .icon { width: 55%; height: 55%; }
+.page-detail-fit .process-step__num { font-size: clamp(14px, 1.8vh, 30px); }
+.page-detail-fit .process-step h4 { font-size: clamp(12.5px, 1.5vh, 15.5px); margin-bottom: clamp(2px, 0.35vh, 7px); }
+.page-detail-fit .process-step p { font-size: clamp(11px, 1.3vh, 13.5px); line-height: 1.45; }
+.page-detail-fit .process-foot { margin-top: clamp(5px, 0.6vh, 20px); }
+.page-detail-fit .process-foot p { font-size: clamp(12px, 1.35vh, 14px); }
+.page-detail-fit .gd-step { padding: clamp(10px, 1.2vh, 24px); }
+.page-detail-fit .gd-step .step-num { margin-bottom: clamp(3px, 0.4vh, 11px); font-size: clamp(10.5px, 1.2vh, 12px); }
+.page-detail-fit .gd-step h4 { font-size: clamp(13px, 1.5vh, 16px); margin-bottom: clamp(2px, 0.35vh, 8px); }
+.page-detail-fit .gd-step p { font-size: clamp(11.5px, 1.35vh, 13.5px); line-height: 1.45; }
+/* 상세 페이지에 .section이 두 개 이상 이어지는 경우(그래픽 상세 등),
+   위아래 padding이 겹쳐 쌓이지 않도록 두 번째부터는 위쪽 padding을 뺀다. */
+.page-detail-fit .section + .section { padding-top: 0; }
+.page-detail-fit .automation__feature h4 { font-size: clamp(13.5px, 1.7vh, 16px); }
+.page-detail-fit .automation__feature p { font-size: clamp(12px, 1.4vh, 14px); }
+/* 풋터도 화면 높이에 맞춰 같이 커지게 — 단 계수는 "900px에서 예전 값 그대로"가
+   되도록 잡는다. 2차 수정 때 계수를 키웠더니 풋터만 165px→236px로 불어나서
+   컨설팅/그래픽 영어 버전이 그만큼 넘쳐버렸다 (메뉴 항목이 6개라 줄간격·글자
+   크기가 조금만 커져도 풋터 전체가 크게 늘어난다 — 여기는 특히 조심할 것). */
+.page-detail-fit .footer { padding-top: clamp(8px, 1.3vh, 28px); margin-top: 0; line-height: 1.18; }
+.page-detail-fit .footer__inner { padding-bottom: clamp(6px, 0.67vh, 20px); gap: clamp(14px, 2vw, 24px); }
+.page-detail-fit .footer__logo { margin-bottom: clamp(3px, 0.33vh, 8px); font-size: clamp(15px, 1.67vh, 18px); }
+.page-detail-fit .footer__tagline { font-size: clamp(12.5px, 1.39vh, 14px); }
+.page-detail-fit .footer__heading { margin-bottom: clamp(4px, 0.44vh, 8px); }
+.page-detail-fit .footer__col { gap: clamp(3px, 0.33vh, 7px); font-size: clamp(12.5px, 1.39vh, 14px); }
+.page-detail-fit .footer__hours { margin-top: 1px; font-size: clamp(12.5px, 1.39vh, 14px); }
+.page-detail-fit .footer__bottom { padding: clamp(5px, 0.55vh, 12px) 24px; font-size: clamp(11.5px, 1.28vh, 12.5px); }
+.page-detail-fit .automation { gap: 28px; }
+.page-detail-fit .automation__feature { padding: 6px 0; gap: 10px; }
+.page-detail-fit .automation__feature-icon { width: 30px; height: 30px; }
+.page-detail-fit .automation__feature h4 { font-size: 13.5px; margin-bottom: 2px; }
+.page-detail-fit .automation__feature p { font-size: 12px; }
+.page-detail-fit .automation__apps { padding: 12px; margin-top: 4px; }
+.page-detail-fit .automation__apps p.heading { margin-bottom: 6px; font-size: 12.5px; }
+.page-detail-fit .automation__apps ul { gap: 5px; }
+.page-detail-fit .automation__cta { padding: clamp(12px, 2vh, 20px); }
+.page-detail-fit .automation__cta h4 { font-size: 14.5px; }
+.page-detail-fit .automation__cta p { font-size: 12px; margin: 3px 0 8px; }
+.page-detail-fit .empty-state { padding: clamp(24px, 5vh, 48px) 24px; }
 
 /* 어플(apps) 카테고리 — 비어있을 때 안내 상태 */
 .empty-state {
@@ -732,7 +848,6 @@ button { font-family: inherit; cursor: pointer; }
 .footer__col { display: flex; flex-direction: column; gap: 6px; font-size: 14px; }
 .footer__col a { color: rgba(255,255,255,.78); }
 .footer__col a:hover { color: #fff; }
-.footer__soon { opacity: .5; }
 .footer__hours { color: rgba(255,255,255,.78); font-size: 14px; margin-top: 2px; }
 .footer__bottom {
     border-top: 1px solid var(--color-border-dark);
@@ -745,16 +860,12 @@ button { font-family: inherit; cursor: pointer; }
 .footer__legal a:hover { color: #fff; }
 
 /* ---------- 그래픽 디자인 페이지 전용 ---------- */
-.gd-hero { text-align: left; }
 .gd-projects { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 22px; }
 .gd-steps { display: grid; grid-template-columns: repeat(4, 1fr); gap: 22px; }
 .gd-step { background: var(--color-bg-cream); border-radius: var(--radius-lg); padding: 26px; color: var(--color-text); }
 .gd-step .step-num { font-size: 12px; font-weight: 700; color: var(--color-accent-warm); letter-spacing: .08em; margin-bottom: 12px; }
 .gd-step h4 { font-size: 16px; font-weight: 700; margin-bottom: 8px; }
 .gd-step p { font-size: 13.5px; color: var(--color-text-muted); }
-.gd-cta { text-align: center; background: var(--color-bg-dark); color: #fff; border-radius: var(--radius-lg); padding: 64px 24px; }
-.gd-cta h2 { font-size: clamp(24px, 3.4vw, 34px); font-weight: 800; margin-bottom: 12px; }
-.gd-cta p { color: var(--color-text-inverse-muted); margin-bottom: 26px; }
 
 /* ---------- 반응형 ---------- */
 @media (max-width: 900px) {

@@ -4,12 +4,14 @@ $pageTitle = t('detail.architecture.construction.title') . ' | DESIGN DAN';
 $pageDescription = t('detail.architecture.construction.intro');
 $activeNav = 'architecture';
 $isDetailPage = true;
+$isDetailFit = true;
+$ogImage = 'images/architecture-construction.jpg'; // 카카오톡·SNS 공유 시 이 페이지 대표 이미지
 require __DIR__ . '/../../includes/header.php';
 
 $detailParentSlug = 'architecture';
 $detailTitleKey   = 'detail.architecture.construction.title';
 $detailIntroKey   = 'detail.architecture.construction.intro';
-$detailIcon       = '🏗️';
+$detailIcon       = 'hard_hat';
 $detailPhoto      = 'images/architecture-construction.jpg';
 $detailPhotoAlt   = t('detail.architecture.construction.title');
 ?>
@@ -21,22 +23,22 @@ $detailPhotoAlt   = t('detail.architecture.construction.title');
         <div class="section--dark process">
             <div class="process-steps">
                 <div class="process-step">
-                    <div class="process-step__top"><span class="process-step__num">01</span><span class="process-step__icon">📋</span></div>
+                    <div class="process-step__top"><span class="process-step__num">01</span><span class="process-step__icon"><?= icon('clipboard_list') ?></span></div>
                     <h4><?= te('process1.step1.title') ?></h4>
                     <p><?= te('process1.step1.desc') ?></p>
                 </div>
                 <div class="process-step">
-                    <div class="process-step__top"><span class="process-step__num">02</span><span class="process-step__icon">✏️</span></div>
+                    <div class="process-step__top"><span class="process-step__num">02</span><span class="process-step__icon"><?= icon('pencil') ?></span></div>
                     <h4><?= te('process1.step2.title') ?></h4>
                     <p><?= te('process1.step2.desc') ?></p>
                 </div>
                 <div class="process-step">
-                    <div class="process-step__top"><span class="process-step__num">03</span><span class="process-step__icon">🏗️</span></div>
+                    <div class="process-step__top"><span class="process-step__num">03</span><span class="process-step__icon"><?= icon('hard_hat') ?></span></div>
                     <h4><?= te('process1.step3.title') ?></h4>
                     <p><?= te('process1.step3.desc') ?></p>
                 </div>
                 <div class="process-step">
-                    <div class="process-step__top"><span class="process-step__num">04</span><span class="process-step__icon">✅</span></div>
+                    <div class="process-step__top"><span class="process-step__num">04</span><span class="process-step__icon"><?= icon('circle_check') ?></span></div>
                     <h4><?= te('process1.step4.title') ?></h4>
                     <p><?= te('process1.step4.desc') ?></p>
                 </div>

@@ -24,10 +24,13 @@
 
     <div class="footer__bottom">
         <p>&copy; <?= date('Y') ?> DESIGN DAN. <?= htmlspecialchars(t('footer.rights')) ?></p>
+        <?php /* 2026-08-18: "관리자 로그인" 링크를 풋터에서 제거했다 (사용자 요청) —
+                 관리자 화면은 일반 방문자에게 노출할 필요가 없다. 관리자는 주소창에
+                 /admin 만 입력하면 로그인 화면으로 들어간다 (admin/index.php가
+                 로그인 안 된 상태면 login.php로 보내준다). */ ?>
         <div class="footer__legal">
-            <a href="#"><?= htmlspecialchars(t('footer.privacy')) ?></a>
-            <a href="#"><?= htmlspecialchars(t('footer.terms')) ?></a>
-            <a href="<?= url('/admin/login.php') ?>"><?= htmlspecialchars(t('footer.staff_login')) ?></a>
+            <a href="<?= url('/privacy/') ?>"><?= htmlspecialchars(t('footer.privacy')) ?></a>
+            <a href="<?= url('/terms/') ?>"><?= htmlspecialchars(t('footer.terms')) ?></a>
         </div>
     </div>
 </footer>

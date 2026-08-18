@@ -4,33 +4,35 @@ $pageTitle = t('card.design.graphic.title') . ' | DESIGN DAN';
 $pageDescription = t('gd.hero_desc');
 $activeNav = 'design';
 $isDetailPage = true;
+$isDetailFit = true;
+$ogImage = 'images/design-graphic-card.jpg'; // 카카오톡·SNS 공유 시 이 페이지 대표 이미지
 require __DIR__ . '/../../includes/header.php';
 
 $detailParentSlug = 'design';
 $detailTitleKey   = 'card.design.graphic.title';
 $detailIntroKey   = 'gd.hero_desc';
-$detailIcon       = '🎨';
+$detailIcon       = 'palette';
 ?>
 <main>
 <?php require __DIR__ . '/../../includes/detail-hero.php'; ?>
 
 <section class="section">
     <div class="container">
-        <div class="card-grid" style="margin-bottom:36px;">
+        <div class="card-grid" style="margin-bottom:14px;">
             <div class="card card--cream">
-                <div class="card__icon">🇰🇷</div>
+                <div class="card__icon"><?= icon('badge_check') ?></div>
                 <h3><?= te('gd.card1.title') ?></h3>
                 <p><?= te('gd.card1.desc') ?></p>
             </div>
             <div class="card card--cream">
-                <div class="card__icon">🚚</div>
+                <div class="card__icon"><?= icon('truck') ?></div>
                 <h3><?= te('gd.card2.title') ?></h3>
                 <p><?= te('gd.card2.desc') ?></p>
             </div>
         </div>
 
-        <h3 style="font-size:18px;font-weight:700;margin-bottom:6px;"><?= te('gd.projects_title') ?></h3>
-        <p style="color:var(--color-text-inverse-muted);font-size:14.5px;margin-bottom:6px;"><?= te('gd.projects_desc') ?></p>
+        <h3 style="font-size:15px;font-weight:700;margin-bottom:4px;"><?= te('gd.projects_title') ?></h3>
+        <p style="color:var(--color-text-inverse-muted);font-size:13px;margin-bottom:4px;"><?= te('gd.projects_desc') ?></p>
         <div class="gd-projects">
             <span class="tag"><?= te('gd.tag1') ?></span>
             <span class="tag"><?= te('gd.tag2') ?></span>

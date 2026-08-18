@@ -13,6 +13,17 @@ ENV APACHE_DOCUMENT_ROOT=/var/www/html
 RUN sed -ri -e "s!/var/www/html!${APACHE_DOCUMENT_ROOT}!g" /etc/apache2/sites-available/*.conf \
     && sed -ri -e "s!/var/www/!${APACHE_DOCUMENT_ROOT}!g" /etc/apache2/apache2.conf /etc/apache2/conf-available/*.conf
 
+# 보안 하드닝 (2026-08-16 추가):
+#   - display_errors 끄기: DB 연결 실패 등 예외가 방문자에게 내부 경로/쿼리를
+#     노출하지 않도록. php:8.2-apache는 기본 php.ini가 없어 컴파일 기본값
+#     (display_errors On)이 그대로 쓰이던 상태였다.
+#   - data/*.db 접근 차단: DATABASE_URL이 없을 때 로컬 SQLite 폴백(includes/db.php)이
+#     문서 루트 안에 생기는데, 지금까지 이걸 막는 설정이 전혀 없어서 배포된 상태
+#     그대로면 /data/app.db가 웹에서 직접 다운로드 가능했다(문의자 개인정보 +
+#     비밀번호 해시 포함). 자세한 내용은 docker/apache-security.conf 참고.
+COPY docker/php-production.ini /usr/local/etc/php/conf.d/zz-app.ini
+COPY docker/apache-security.conf /etc/apache2/conf-enabled/zz-app-security.conf
+
 # 프로젝트 파일 전체 복사
 COPY . /var/www/html/
 

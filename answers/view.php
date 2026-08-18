@@ -1,27 +1,49 @@
 <?php
-if (session_status() !== PHP_SESSION_ACTIVE) {
-    session_start();
-}
+require __DIR__ . '/../includes/session-boot.php';
+startAppSession();
 
 require __DIR__ . '/../config.php';
 require __DIR__ . '/../includes/db.php';
 require __DIR__ . '/../includes/answers-data.php';
+require __DIR__ . '/../includes/rate-limit.php';
+require __DIR__ . '/../includes/csrf.php';
+require __DIR__ . '/../includes/error-page.php';
 
 $id = (int) ($_GET['id'] ?? 0);
-$inquiry = $id > 0 ? getInquiry($id) : null;
 
 $passwordError = false;
-if ($inquiry && !empty($inquiry['is_locked']) && $_SERVER['REQUEST_METHOD'] === 'POST') {
-    $submittedPassword = (string) ($_POST['password'] ?? '');
-    if (verifyInquiryPassword($inquiry, $submittedPassword)) {
-        $_SESSION['unlocked_inquiries'][$id] = true;
-        header('Location: ' . url('/answers/view.php') . '?id=' . $id);
-        exit;
-    }
-    $passwordError = true;
-}
+$lockedOut = false;
+$rateLimitId = clientIp() . ':' . $id; // IP당이 아니라 "이 글을 이 IP가" 기준 — 다른 글 보는 건 안 막는다
 
-$isUnlocked = !$inquiry || empty($inquiry['is_locked']) || !empty($_SESSION['unlocked_inquiries'][$id]);
+// DB 접근은 전부 화면을 그리기 전에 끝낸다 (renderErrorPage가 헤더를 직접 그리므로,
+// 헤더가 이미 출력된 뒤에는 에러 페이지를 제대로 보여줄 수 없다).
+try {
+    $inquiry = $id > 0 ? getInquiry($id) : null;
+
+    if ($inquiry && !empty($inquiry['is_locked']) && $_SERVER['REQUEST_METHOD'] === 'POST') {
+        if (!csrfCheck($_POST['csrf_token'] ?? '')) {
+            $passwordError = true;
+        } elseif (tooManyAttempts('answer_unlock', $rateLimitId)) {
+            $lockedOut = true;
+        } else {
+            $submittedPassword = (string) ($_POST['password'] ?? '');
+            if (verifyInquiryPassword($inquiry, $submittedPassword)) {
+                clearAttempts('answer_unlock', $rateLimitId);
+                $_SESSION['unlocked_inquiries'][$id] = true;
+                header('Location: ' . url('/answers/view.php') . '?id=' . $id);
+                exit;
+            }
+            recordFailedAttempt('answer_unlock', $rateLimitId);
+            $passwordError = true;
+        }
+    }
+
+    $isUnlocked = !$inquiry || empty($inquiry['is_locked']) || !empty($_SESSION['unlocked_inquiries'][$id]);
+    // 잠금이 풀린 글이면 답변까지 미리 읽어둔다 (예전엔 본문 렌더링 중간에 조회했다)
+    $replies = ($inquiry && $isUnlocked) ? getRepliesFor($inquiry['id']) : [];
+} catch (Throwable $e) {
+    renderDbErrorPage($e);
+}
 
 $pageTitle = t('answers.title') . ' | DESIGN DAN';
 $pageDescription = t('answers.intro');
@@ -48,14 +70,17 @@ require __DIR__ . '/../includes/header.php';
             <div class="card">
                 <p style="margin-bottom:16px;"><?= te('answers.password.prompt') ?></p>
                 <form method="post" class="form-grid">
+                    <?= csrfField() ?>
                     <div class="field field--full">
                         <label for="viewPassword"><?= te('answers.password.label') ?></label>
-                        <input type="password" id="viewPassword" name="password" autofocus required>
+                        <input type="password" id="viewPassword" name="password" autofocus required <?= $lockedOut ? 'disabled' : '' ?>>
                     </div>
-                    <?php if ($passwordError): ?>
+                    <?php if ($lockedOut): ?>
+                        <p class="field--full" style="color:#c0392b;font-size:13.5px;"><?= te('answers.password.locked') ?></p>
+                    <?php elseif ($passwordError): ?>
                         <p class="field--full" style="color:#c0392b;font-size:13.5px;"><?= te('answers.password.error') ?></p>
                     <?php endif; ?>
-                    <button type="submit" class="btn btn--primary field--full" style="justify-content:center;"><?= te('answers.password.submit') ?></button>
+                    <button type="submit" class="btn btn--primary field--full" style="justify-content:center;" <?= $lockedOut ? 'disabled' : '' ?>><?= te('answers.password.submit') ?></button>
                 </form>
             </div>
 
@@ -82,7 +107,7 @@ require __DIR__ . '/../includes/header.php';
                 <p><?= htmlspecialchars(substr($inquiry['created_at'], 0, 10)) ?></p>
             </div>
 
-            <?php $replies = getRepliesFor($inquiry['id']); ?>
+            <?php /* $replies는 위쪽 try 블록에서 미리 조회해둔다 */ ?>
             <?php if (empty($replies)): ?>
                 <div class="card card--cream">
                     <p><?= te('answers.reply.none') ?></p>
